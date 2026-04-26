@@ -4,155 +4,83 @@ import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicEntity
 
 object CbcSeedData {
     val topics: List<TopicEntity> = listOf(
-        TopicEntity(
-            id = 1,
-            title = "Classification of Living Things",
-            subject = "Biology",
-            classLevel = "S1",
-            lessonPlan = "Guide learners to classify organisms using observable characteristics.",
-            projectIdeas = "Create a chart showing local organisms grouped by kingdom.",
-            assessmentRubric = "Accuracy of classification, clarity of explanations, teamwork.",
-            teachingTips = "Use real examples from the school compound for engagement."
-        ),
-        TopicEntity(
-            id = 2,
-            title = "Photosynthesis",
-            subject = "Biology",
-            classLevel = "S2",
-            lessonPlan = "Learners explain how plants make food and factors affecting the process.",
-            projectIdeas = "Investigate effects of light by comparing covered and exposed leaves.",
-            assessmentRubric = "Scientific method, observation quality, and conclusion quality.",
-            teachingTips = "Encourage hypothesis writing before practical activities."
-        ),
-        TopicEntity(
-            id = 3,
-            title = "Set Theory and Venn Diagrams",
-            subject = "Mathematics",
-            classLevel = "S1",
-            lessonPlan = "Teach set notation, subsets, and operations through guided examples.",
-            projectIdeas = "Collect class data and represent using Venn diagrams.",
-            assessmentRubric = "Correct notation, diagram accuracy, interpretation.",
-            teachingTips = "Start with relatable categories such as sports and clubs."
-        ),
-        TopicEntity(
-            id = 4,
-            title = "Linear Equations",
-            subject = "Mathematics",
-            classLevel = "S2",
-            lessonPlan = "Solve one-variable equations and connect to word problems.",
-            projectIdeas = "Design market-based budgeting problems solved with equations.",
-            assessmentRubric = "Procedure correctness, final answer, application to context.",
-            teachingTips = "Use think-pair-share for multi-step solutions."
-        ),
-        TopicEntity(
-            id = 5,
-            title = "Grammar and Sentence Structure",
-            subject = "English",
-            classLevel = "S1",
-            lessonPlan = "Develop sentence construction skills using guided writing tasks.",
-            projectIdeas = "Create peer-reviewed paragraph writing portfolios.",
-            assessmentRubric = "Grammar accuracy, coherence, punctuation.",
-            teachingTips = "Use short peer feedback cycles for quick improvement."
-        ),
-        TopicEntity(
-            id = 6,
-            title = "Composition Writing",
-            subject = "English",
-            classLevel = "S2",
-            lessonPlan = "Build composition structure: introduction, body, and conclusion.",
-            projectIdeas = "Write local community stories and present orally.",
-            assessmentRubric = "Organization, creativity, language use.",
-            teachingTips = "Provide model compositions before independent writing."
-        ),
-        TopicEntity(
-            id = 7,
-            title = "Chemical Bonding",
-            subject = "Chemistry",
-            classLevel = "S2",
-            lessonPlan = "Differentiate ionic and covalent bonds with particle models.",
-            projectIdeas = "Build bonding models from low-cost local materials.",
-            assessmentRubric = "Concept accuracy, model quality, explanation depth.",
-            teachingTips = "Use visual aids to reduce abstractness."
-        ),
-        TopicEntity(
-            id = 8,
-            title = "Force and Motion",
-            subject = "Physics",
-            classLevel = "S1",
-            lessonPlan = "Introduce balanced/unbalanced forces and motion graphs.",
-            projectIdeas = "Measure toy car motion on different surfaces.",
-            assessmentRubric = "Data capture, graphing, interpretation.",
-            teachingTips = "Use short demonstrations before formula introduction."
-        ),
-        TopicEntity(
-            id = 9,
-            title = "Early Man in East Africa",
-            subject = "History & Political Education",
-            classLevel = "S1",
-            lessonPlan = "Explore early communities and migration patterns in East Africa.",
-            projectIdeas = "Timeline poster of major early historical developments.",
-            assessmentRubric = "Historical accuracy, sequencing, collaboration.",
-            teachingTips = "Encourage local oral history examples."
-        ),
-        TopicEntity(
-            id = 10,
-            title = "Map Reading",
-            subject = "Geography",
-            classLevel = "S1",
-            lessonPlan = "Interpret map symbols, scale, and direction for local maps.",
-            projectIdeas = "Draw a simple map of school and surroundings.",
-            assessmentRubric = "Symbol usage, scale estimate, orientation.",
-            teachingTips = "Use local area sketches before national maps."
-        ),
-        TopicEntity(
-            id = 11,
-            title = "Business Ideas and Opportunities",
-            subject = "Entrepreneurship",
-            classLevel = "S1",
-            lessonPlan = "Identify problems in the community and propose business ideas.",
-            projectIdeas = "Pitch a micro business idea for school environment.",
-            assessmentRubric = "Feasibility, innovation, clarity of pitch.",
-            teachingTips = "Use local examples from markets and kiosks."
-        ),
-        TopicEntity(
-            id = 12,
-            title = "Crop Production Basics",
-            subject = "Agriculture",
-            classLevel = "S1",
-            lessonPlan = "Introduce seed selection, planting, and crop management.",
-            projectIdeas = "Set up a small demonstration garden plot.",
-            assessmentRubric = "Planning, crop care, reflection.",
-            teachingTips = "Link content to seasonal local farming practices."
-        ),
-        TopicEntity(
-            id = 13,
-            title = "Computer Hardware Fundamentals",
-            subject = "ICT",
-            classLevel = "S1",
-            lessonPlan = "Identify computer parts and explain their functions.",
-            projectIdeas = "Label hardware components from available lab devices.",
-            assessmentRubric = "Correct identification, function explanation.",
-            teachingTips = "Use hands-on rotation in small groups."
-        ),
-        TopicEntity(
-            id = 14,
-            title = "Kiswahili Communication Basics",
-            subject = "Kiswahili",
-            classLevel = "S1",
-            lessonPlan = "Build common classroom greetings and short conversations.",
-            projectIdeas = "Role-play market and school communication scenes.",
-            assessmentRubric = "Pronunciation, vocabulary use, confidence.",
-            teachingTips = "Promote pair speaking practice."
-        ),
-        TopicEntity(
-            id = 15,
-            title = "Religious Values and Ethics",
-            subject = "Religious Education",
-            classLevel = "S1",
-            lessonPlan = "Discuss values, ethics, and responsible behavior in community life.",
-            projectIdeas = "Group discussion report on values in school leadership.",
-            assessmentRubric = "Participation, reflection quality, relevance.",
-            teachingTips = "Use real school-life scenarios to anchor discussion."
-        )
+        buildTopic(1, "Biology", "S1", "Classification of Living Things"),
+        buildTopic(2, "Biology", "S2", "Nutrition in Plants and Animals"),
+        buildTopic(3, "Biology", "S3", "Human Reproductive System"),
+        buildTopic(4, "Biology", "S4", "Ecology and Environmental Conservation"),
+
+        buildTopic(5, "Mathematics", "S1", "Sets and Venn Diagrams"),
+        buildTopic(6, "Mathematics", "S2", "Linear Equations"),
+        buildTopic(7, "Mathematics", "S3", "Quadratic Expressions"),
+        buildTopic(8, "Mathematics", "S4", "Statistics and Probability"),
+
+        buildTopic(9, "English", "S1", "Grammar and Sentence Structure"),
+        buildTopic(10, "English", "S2", "Composition Writing"),
+        buildTopic(11, "English", "S3", "Poetry Interpretation"),
+        buildTopic(12, "English", "S4", "Oral Communication Skills"),
+
+        buildTopic(13, "Chemistry", "S1", "States of Matter"),
+        buildTopic(14, "Chemistry", "S2", "Chemical Bonding"),
+        buildTopic(15, "Chemistry", "S3", "Acids, Bases and Salts"),
+        buildTopic(16, "Chemistry", "S4", "Organic Chemistry Basics"),
+
+        buildTopic(17, "Physics", "S1", "Force and Motion"),
+        buildTopic(18, "Physics", "S2", "Work, Energy and Power"),
+        buildTopic(19, "Physics", "S3", "Electricity and Circuits"),
+        buildTopic(20, "Physics", "S4", "Waves, Light and Sound"),
+
+        buildTopic(21, "History & Political Education", "S1", "Early Communities in East Africa"),
+        buildTopic(22, "History & Political Education", "S2", "Colonial Rule in Uganda"),
+        buildTopic(23, "History & Political Education", "S3", "Nationalism and Independence"),
+        buildTopic(24, "History & Political Education", "S4", "Constitutional and Civic Governance"),
+
+        buildTopic(25, "Geography", "S1", "Map Work Fundamentals"),
+        buildTopic(26, "Geography", "S2", "Weather and Climate"),
+        buildTopic(27, "Geography", "S3", "Population and Settlement"),
+        buildTopic(28, "Geography", "S4", "Natural Resources and Development"),
+
+        buildTopic(29, "Entrepreneurship", "S1", "Business Ideas and Opportunities"),
+        buildTopic(30, "Entrepreneurship", "S2", "Starting and Managing a Small Business"),
+        buildTopic(31, "Entrepreneurship", "S3", "Marketing and Customer Care"),
+        buildTopic(32, "Entrepreneurship", "S4", "Financial Literacy and Record Keeping"),
+
+        buildTopic(33, "Kiswahili", "S1", "Greetings and Basic Conversation"),
+        buildTopic(34, "Kiswahili", "S2", "Reading and Listening Comprehension"),
+        buildTopic(35, "Kiswahili", "S3", "Insha Writing"),
+        buildTopic(36, "Kiswahili", "S4", "Public Speaking and Debate"),
+
+        buildTopic(37, "Religious Education", "S1", "Values and Moral Formation"),
+        buildTopic(38, "Religious Education", "S2", "Sacred Texts and Interpretation"),
+        buildTopic(39, "Religious Education", "S3", "Faith, Leadership and Society"),
+        buildTopic(40, "Religious Education", "S4", "Ethics, Peace and Social Justice"),
+
+        buildTopic(41, "Agriculture", "S1", "Crop Production Basics"),
+        buildTopic(42, "Agriculture", "S2", "Soil Fertility and Conservation"),
+        buildTopic(43, "Agriculture", "S3", "Animal Husbandry"),
+        buildTopic(44, "Agriculture", "S4", "Agribusiness and Farm Management"),
+
+        buildTopic(45, "ICT", "S1", "Computer Fundamentals"),
+        buildTopic(46, "ICT", "S2", "Word Processing and Spreadsheets"),
+        buildTopic(47, "ICT", "S3", "Internet Safety and Research Skills"),
+        buildTopic(48, "ICT", "S4", "Introduction to Programming")
     )
+
+    private fun buildTopic(
+        id: Int,
+        subject: String,
+        classLevel: String,
+        title: String
+    ): TopicEntity {
+        val learnerActivity = "Learners work in groups to solve a practical task related to $title."
+        return TopicEntity(
+            id = id,
+            title = title,
+            subject = subject,
+            classLevel = classLevel,
+            lessonPlan = "Competency focus for $classLevel $subject: $title. $learnerActivity",
+            projectIdeas = "Project: design a simple classroom artifact that demonstrates $title using local materials.",
+            assessmentRubric = "Assess understanding, application, collaboration, and communication on a 4-point scale.",
+            teachingTips = "Start with local examples, guide peer learning, and finish with reflective exit questions."
+        )
+    }
 }
