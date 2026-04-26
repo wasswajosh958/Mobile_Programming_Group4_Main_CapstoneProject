@@ -50,4 +50,6 @@
     <string name="about_item_testing">Includes unit and UI tests for core flows</string>
     <string name="about_item_animations">Applies animations on splash and content transitions</string>
     <string name="back_to_home">Back</string>
+    <string name="official_resources">Official resources (NCDC)</string>
+    <string name="open_on_ncdc">Search on NCDC</string>
 </resources>

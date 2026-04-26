@@ -44,8 +44,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openUrl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -118,6 +120,24 @@ fun ResourceDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
+            DetailSectionCard(
+                title = stringResource(id = R.string.official_resources),
+                content = "",
+                expanded = true,
+                onToggle = {}
+            )
+            val context = LocalContext.current
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    // Safe/copyright-friendly: open official source in browser
+                    val query = "site:ncdc.go.ug ${topic.subject} ${topic.classLevel} ${topic.title}"
+                    openUrl(context, "https://www.google.com/search?q=" + java.net.URLEncoder.encode(query, "UTF-8"))
+                }
+            ) {
+                Text(text = stringResource(id = R.string.open_on_ncdc))
+            }
+
             DetailSectionCard(
                 title = stringResource(id = R.string.lesson_plan),
                 content = topic.lessonPlan,
