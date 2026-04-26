@@ -1,4 +1,29 @@
 <resources>
     <string name="app_name">CBC Teachers\' Toolkit</string>
     <string name="hello_android">Welcome to CBC Teachers\' Toolkit</string>
+    <string name="welcome_teacher">Welcome, Teacher</string>
+    <string name="search_hint">Search by topic, class, or subject</string>
+    <string name="browse_subjects">Browse Subjects</string>
+    <string name="available_topics">Available Topics</string>
+    <string name="all_subjects">All Subjects</string>
+    <string name="all_classes">All Classes</string>
+    <string name="filter_subject">Filter by Subject</string>
+    <string name="filter_class">Filter by Class</string>
+    <string name="no_topics_found">No topics found for this filter.</string>
+    <string name="favorite">Favorite</string>
+    <string name="add_note">Add Note</string>
+    <string name="saved_note">Saved Note</string>
+    <string name="note_hint">Write personal teaching notes here</string>
+    <string name="lesson_plan">Lesson Plan</string>
+    <string name="project_ideas">Project Ideas</string>
+    <string name="assessment_rubric">Assessment Rubric</string>
+    <string name="teaching_tips">Teaching Tips</string>
+    <string name="back">Back</string>
+    <string name="open_topics">Open Topics</string>
+    <string name="topics_count">%1$d topics</string>
+    <string name="subject_and_class">%1$s - %2$s</string>
+    <string name="favorites_count">Favorites: %1$d</string>
+    <string name="notes_count">Notes: %1$d</string>
+    <string name="resource_title_format">%1$s (%2$s %3$s)</string>
+    <string name="loading_topics">Loading topics...</string>
 </resources>

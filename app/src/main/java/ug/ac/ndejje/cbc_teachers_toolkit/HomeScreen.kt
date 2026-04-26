@@ -1,31 +1,49 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
-// Best practice: Small data class for better type safety and keys
-data class SubjectItem(
-    val name: String,
-    val route: String = "subjects"   // We will improve navigation later
-)
+data class SubjectItem(val name: String)
 
 @Composable
-fun HomeScreen(navController: NavController) {
-    val subjects = listOf(
-        SubjectItem("Biology"),
-        SubjectItem("Mathematics"),
-        SubjectItem("English"),
-        SubjectItem("Chemistry"),
-        SubjectItem("Physics")
-    )
+fun HomeScreen(
+    navController: NavController,
+    viewModel: SubjectViewModel
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val subjects = uiState.availableSubjects.map { SubjectItem(it) }
+    var showContent by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        showContent = true
+    }
 
     Column(
         modifier = Modifier
@@ -37,36 +55,73 @@ fun HomeScreen(navController: NavController) {
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
 
         Text(
-            text = "Welcome, Teacher!",
+            text = stringResource(id = R.string.welcome_teacher),
             style = MaterialTheme.typography.titleLarge
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
-        // BEST PRACTICE LazyColumn
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(
+                    id = R.string.favorites_count,
+                    uiState.favorites.size
+                ),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = stringResource(
+                    id = R.string.notes_count,
+                    uiState.notes.size
+                ),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+
+        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
             items(
                 items = subjects,
-                key = { it.name }               // Very important for performance
+                key = { it.name }
             ) { subject ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    onClick = {
-                        navController.navigate(subject.route)
-                    }
+                AnimatedVisibility(
+                    visible = showContent,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
                 ) {
-                    Text(
-                        text = subject.name,
-                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = dimensionResource(id = R.dimen.card_elevation)
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(dimensionResource(id = R.dimen.padding_medium)),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = subject.name,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            OutlinedButton(onClick = {
+                                viewModel.selectSubject(subject.name)
+                                navController.navigate("subjects")
+                            }) {
+                                Text(text = stringResource(id = R.string.open_topics))
+                            }
+                        }
+                    }
                 }
             }
         }
