@@ -8,15 +8,17 @@ An Android app built with Kotlin and Jetpack Compose to support CBC lesson prepa
 
 ## Core Features
 - Home screen with subject cards and animated entry.
+- Animated splash screen with automatic transition to home.
 - Subject/topic browsing with search and filter by subject/class.
 - Resource detail screen with:
   - Lesson plan
   - Project ideas
   - Assessment rubric
   - Teaching tips
-- Favorites and teacher notes.
+- Favorites and teacher notes persisted with Room.
+- `My Library` screen for quick access to favorite and noted topics.
 - Room database seeding for offline-first usage.
-- Basic animations across list/detail UX.
+- Animations across splash, list entry, loading content, and detail interactions.
 
 ## Technical Stack
 - Kotlin
@@ -26,15 +28,29 @@ An Android app built with Kotlin and Jetpack Compose to support CBC lesson prepa
 - Navigation Compose
 
 ## Screens (Current)
+- `SplashScreen`
 - `HomeScreen`
 - `SubjectsScreen`
+- `LibraryScreen`
 - `ResourceDetailScreen`
 
 ## Testing Summary
 - `toggleFavorite adds and removes topic id`
 - `searchQuery filters topics by title`
+- `saveNote stores note in uiState map`
+- `splashTransitionsToHomeScreen` (instrumentation)
 
-Both tests are located in `SubjectViewModelTest`.
+Tests are located in `SubjectViewModelTest` and `AppNavigationTest`.
+
+## Capstone Requirement Mapping
+- Kotlin + Jetpack Compose: implemented.
+- MVVM architecture: implemented with `SubjectViewModel` + repository layer.
+- Dynamic lists: implemented with `LazyColumn`/`LazyRow`.
+- Navigation with 3+ screens: implemented (`Splash`, `Home`, `Subjects`, `Library`, `Detail`).
+- State management: Compose state + `StateFlow`.
+- Persistence: Room entities/DAO/repository (topics, favorites, notes).
+- Tests: unit tests + one instrumentation navigation test.
+- Clean `MainActivity`: entry point only.
 
 ## Team Roles
 Replace placeholders with final names before submission.
@@ -49,3 +65,13 @@ Replace placeholders with final names before submission.
 1. Open project in Android Studio.
 2. Sync Gradle.
 3. Run on emulator or Android device (min SDK 24).
+4. Run tests:
+   - Unit: `./gradlew testDebugUnitTest`
+   - Instrumentation: `./gradlew connectedDebugAndroidTest`
+
+## Submission Checklist
+- [ ] Replace team role placeholders with actual names.
+- [ ] Capture screenshots for all main screens.
+- [ ] Generate and verify release/debug APK.
+- [ ] Include proposal and final report PDFs.
+- [ ] Ensure latest commits are pushed to GitHub.
