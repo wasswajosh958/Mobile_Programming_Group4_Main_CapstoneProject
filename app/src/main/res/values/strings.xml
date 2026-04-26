@@ -52,4 +52,9 @@
     <string name="back_to_home">Back</string>
     <string name="official_resources">Official resources (NCDC)</string>
     <string name="open_on_ncdc">Search on NCDC</string>
+    <string name="open_updates">Update Resources</string>
+    <string name="updates_title">Updates</string>
+    <string name="updates_subtitle">Download latest resource links when online, then use them offline.</string>
+    <string name="update_resources_button">Update Resources Now</string>
+    <string name="updates_status_format">Status: %1$s</string>
 </resources>

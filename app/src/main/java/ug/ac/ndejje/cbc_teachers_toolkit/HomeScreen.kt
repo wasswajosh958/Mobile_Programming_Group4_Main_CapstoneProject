@@ -96,6 +96,12 @@ fun HomeScreen(
         ) {
             Text(text = stringResource(id = R.string.open_about))
         }
+        TextButton(
+            onClick = { navController.navigate("updates") },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(id = R.string.open_updates))
+        }
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 

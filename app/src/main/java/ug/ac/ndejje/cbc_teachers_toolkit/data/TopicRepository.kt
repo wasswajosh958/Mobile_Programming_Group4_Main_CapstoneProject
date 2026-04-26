@@ -2,6 +2,8 @@ package ug.ac.ndejje.cbc_teachers_toolkit.data
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import ug.ac.ndejje.cbc_teachers_toolkit.data.remote.ResourceIndexParser
+import ug.ac.ndejje.cbc_teachers_toolkit.data.remote.SimpleHttpClient
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicDao
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.NoteEntity
@@ -45,6 +47,24 @@ class TopicRepository(
         // We seed generic NCDC search links per topic to enable teachers to reach official sources.
         // If resources already exist, we do nothing.
         // (A full remote sync can be added later.)
+    }
+
+    suspend fun syncResourcesFromIndexUrl(indexUrl: String): Int {
+        val json = SimpleHttpClient.get(indexUrl)
+        val parsed = ResourceIndexParser.parse(json)
+
+        val entities = parsed.items.map { item ->
+            TeachingResourceEntity(
+                topicId = item.topicId,
+                title = item.title,
+                type = item.type,
+                url = item.url,
+                source = item.source ?: "NCDC"
+            )
+        }
+
+        topicDao.insertResources(entities)
+        return entities.size
     }
 
     fun observeSchemes(): Flow<List<SchemeOfWorkEntity>> = topicDao.observeSchemes()

@@ -25,6 +25,12 @@ data class SubjectsUiState(
     val notes: Map<Int, String> = emptyMap()
 )
 
+data class UpdatesUiState(
+    val isUpdating: Boolean = false,
+    val status: String = "Idle",
+    val message: String = ""
+)
+
 class SubjectViewModel(
     private val repository: TopicRepository
 ) : ViewModel() {
@@ -80,6 +86,33 @@ class SubjectViewModel(
     init {
         viewModelScope.launch {
             repository.seedIfEmpty()
+        }
+    }
+
+    private val _updatesState = MutableStateFlow(UpdatesUiState())
+    val updatesState: StateFlow<UpdatesUiState> = _updatesState
+
+    // Hosted JSON index (safe: metadata + links only). You can replace this later with your own hosting.
+    private val resourceIndexUrl =
+        "https://raw.githubusercontent.com/wasswajosh958/Mobile_Programming_Group4_Main_CapstoneProject/main/resources/resource_index.json"
+
+    fun updateResourcesNow() {
+        viewModelScope.launch {
+            _updatesState.value = UpdatesUiState(isUpdating = true, status = "Updating", message = "")
+            try {
+                val count = repository.syncResourcesFromIndexUrl(resourceIndexUrl)
+                _updatesState.value = UpdatesUiState(
+                    isUpdating = false,
+                    status = "Updated",
+                    message = "Downloaded $count resources for offline use."
+                )
+            } catch (e: Exception) {
+                _updatesState.value = UpdatesUiState(
+                    isUpdating = false,
+                    status = "Failed",
+                    message = e.message ?: "Update failed"
+                )
+            }
         }
     }
 
