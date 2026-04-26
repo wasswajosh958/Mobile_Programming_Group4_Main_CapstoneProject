@@ -5,7 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [TopicEntity::class], version = 1, exportSchema = false)
+@Database(
+    entities = [TopicEntity::class, FavoriteEntity::class, NoteEntity::class],
+    version = 2,
+    exportSchema = false
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun topicDao(): TopicDao
 
@@ -19,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "cbc_teachers_toolkit.db"
-                ).build().also { INSTANCE = it }
+                ).fallbackToDestructiveMigration(false).build().also { INSTANCE = it }
             }
         }
     }

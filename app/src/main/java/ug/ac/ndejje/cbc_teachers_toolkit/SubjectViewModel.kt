@@ -3,10 +3,9 @@ package ug.ac.ndejje.cbc_teachers_toolkit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -33,17 +32,21 @@ class SubjectViewModel(
     private val selectedSubject = MutableStateFlow<String?>(null)
     private val selectedClassLevel = MutableStateFlow<String?>(null)
     private val searchQuery = MutableStateFlow("")
-    private val favorites = MutableStateFlow<Set<Int>>(emptySet())
-    private val notes = MutableStateFlow<Map<Int, String>>(emptyMap())
-
     val uiState: StateFlow<SubjectsUiState> = combine(
         repository.observeTopics(),
         selectedSubject,
         selectedClassLevel,
         searchQuery,
-        favorites,
-        notes
-    ) { topics, subject, classLevel, query, favoriteIds, noteMap ->
+        repository.observeFavoriteIds(),
+        repository.observeNotes()
+    ) { flowArray ->
+        val topics = flowArray[0] as List<Topic>
+        val subject = flowArray[1] as String?
+        val classLevel = flowArray[2] as String?
+        val query = flowArray[3] as String
+        val favoriteIds = flowArray[4] as Set<Int>
+        val noteMap = flowArray[5] as Map<Int, String>
+
         val normalizedQuery = query.trim().lowercase()
         val filtered = topics.filter { topic ->
             val subjectMatches = subject.isNullOrBlank() || topic.subject == subject
@@ -93,15 +96,15 @@ class SubjectViewModel(
     }
 
     fun toggleFavorite(topicId: Int) {
-        val current = favorites.value.toMutableSet()
-        if (current.contains(topicId)) current.remove(topicId) else current.add(topicId)
-        favorites.value = current
+        viewModelScope.launch {
+            repository.toggleFavorite(topicId)
+        }
     }
 
     fun saveNote(topicId: Int, note: String) {
-        val updated = notes.value.toMutableMap()
-        if (note.isBlank()) updated.remove(topicId) else updated[topicId] = note
-        notes.value = updated
+        viewModelScope.launch {
+            repository.saveNote(topicId, note)
+        }
     }
 
     fun topicById(topicId: Int): Topic? {
