@@ -12,7 +12,9 @@
     <string name="no_topics_found">No topics found for this filter.</string>
     <string name="favorite">Favorite</string>
     <string name="add_note">Add Note</string>
+    <string name="save_note">Save Note</string>
     <string name="saved_note">Saved Note</string>
+    <string name="note_saved_message">Note saved for this topic.</string>
     <string name="note_hint">Write personal teaching notes here</string>
     <string name="lesson_plan">Lesson Plan</string>
     <string name="project_ideas">Project Ideas</string>
