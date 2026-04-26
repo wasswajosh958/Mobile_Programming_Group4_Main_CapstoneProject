@@ -49,4 +49,18 @@ interface TopicDao {
     suspend fun toggleFavorite(topicId: Int) {
         if (isFavorite(topicId)) deleteFavorite(topicId) else insertFavorite(FavoriteEntity(topicId))
     }
+
+    // Teaching resources
+    @Query("SELECT * FROM teaching_resources WHERE topicId = :topicId ORDER BY id DESC")
+    fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertResources(resources: List<TeachingResourceEntity>)
+
+    // Schemes of work
+    @Query("SELECT * FROM schemes_of_work ORDER BY subject, classLevel, term, week")
+    fun observeSchemes(): Flow<List<SchemeOfWorkEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertScheme(scheme: SchemeOfWorkEntity): Long
 }

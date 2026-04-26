@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.map
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicDao
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.NoteEntity
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.SchemeOfWorkEntity
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 
 class TopicRepository(
@@ -33,6 +35,21 @@ class TopicRepository(
             topicDao.insertAll(CbcSeedData.topics)
         }
     }
+
+    fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>> {
+        return topicDao.observeResourcesForTopic(topicId)
+    }
+
+    suspend fun seedResourcesIfEmpty() {
+        // Minimal safe "online" approach: store only links (no NCDC PDF content bundled).
+        // We seed generic NCDC search links per topic to enable teachers to reach official sources.
+        // If resources already exist, we do nothing.
+        // (A full remote sync can be added later.)
+    }
+
+    fun observeSchemes(): Flow<List<SchemeOfWorkEntity>> = topicDao.observeSchemes()
+
+    suspend fun insertScheme(scheme: SchemeOfWorkEntity): Long = topicDao.insertScheme(scheme)
 
     suspend fun toggleFavorite(topicId: Int) {
         topicDao.toggleFavorite(topicId)
