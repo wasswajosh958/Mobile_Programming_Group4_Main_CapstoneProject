@@ -18,6 +18,7 @@ import org.junit.Test
 import ug.ac.ndejje.cbc_teachers_toolkit.data.TopicRepository
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicDao
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicEntity
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicNoteProjection
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SubjectViewModelTest {
@@ -64,6 +65,21 @@ class SubjectViewModelTest {
         assertEquals("Photosynthesis", topics.first().title)
     }
 
+    @Test
+    fun `saveNote stores note in uiState map`() = runTest {
+        val fakeDao = FakeTopicDao()
+        fakeDao.insertAll(seedTopics())
+        val repository = TopicRepository(fakeDao)
+        val viewModel = SubjectViewModel(repository)
+
+        advanceUntilIdle()
+        viewModel.saveNote(2, "Revise worked examples for this lesson")
+        advanceUntilIdle()
+
+        val note = viewModel.uiState.value.notes[2]
+        assertEquals("Revise worked examples for this lesson", note)
+    }
+
     private fun seedTopics(): List<TopicEntity> = listOf(
         TopicEntity(
             id = 1,
@@ -90,6 +106,8 @@ class SubjectViewModelTest {
 
 private class FakeTopicDao : TopicDao {
     private val state = MutableStateFlow<List<TopicEntity>>(emptyList())
+    private val favoritesState = MutableStateFlow<List<Int>>(emptyList())
+    private val notesState = MutableStateFlow<List<TopicNoteProjection>>(emptyList())
 
     override fun observeTopics(): Flow<List<TopicEntity>> = state
 
@@ -102,4 +120,34 @@ private class FakeTopicDao : TopicDao {
     }
 
     override suspend fun countTopics(): Int = state.value.size
+
+    override fun observeFavoriteIds(): Flow<List<Int>> = favoritesState
+
+    override suspend fun getNote(topicId: Int): String? {
+        return notesState.value.firstOrNull { it.topicId == topicId }?.note
+    }
+
+    override fun observeNotes(): Flow<List<TopicNoteProjection>> = notesState
+
+    override suspend fun insertFavorite(favorite: ug.ac.ndejje.cbc_teachers_toolkit.data.local.FavoriteEntity) {
+        favoritesState.value = (favoritesState.value + favorite.topicId).distinct()
+    }
+
+    override suspend fun deleteFavorite(topicId: Int) {
+        favoritesState.value = favoritesState.value.filterNot { it == topicId }
+    }
+
+    override suspend fun isFavorite(topicId: Int): Boolean {
+        return favoritesState.value.contains(topicId)
+    }
+
+    override suspend fun upsertNote(note: ug.ac.ndejje.cbc_teachers_toolkit.data.local.NoteEntity) {
+        val updated = notesState.value.filterNot { it.topicId == note.topicId } +
+            TopicNoteProjection(note.topicId, note.note)
+        notesState.value = updated
+    }
+
+    override suspend fun deleteNote(topicId: Int) {
+        notesState.value = notesState.value.filterNot { it.topicId == topicId }
+    }
 }
