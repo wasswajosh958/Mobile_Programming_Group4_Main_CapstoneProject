@@ -10,6 +10,7 @@ An Android app built with Kotlin and Jetpack Compose to support CBC lesson prepa
 - Home screen with subject cards and animated entry.
 - Animated splash screen with automatic transition to home.
 - Subject/topic browsing with search and filter by subject/class.
+- Collapsible animated sections in topic detail content.
 - Resource detail screen with:
   - Lesson plan
   - Project ideas
@@ -32,6 +33,7 @@ An Android app built with Kotlin and Jetpack Compose to support CBC lesson prepa
 - `HomeScreen`
 - `SubjectsScreen`
 - `LibraryScreen`
+- `AboutScreen`
 - `ResourceDetailScreen`
 
 ## Testing Summary
