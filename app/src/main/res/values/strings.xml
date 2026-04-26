@@ -34,4 +34,5 @@
     <string name="library_empty">No favorites or notes yet. Open a topic and save one.</string>
     <string name="favorite_topics_title">Favorite Topics</string>
     <string name="noted_topics_title">Topics With Notes</string>
+    <string name="reset_filters">Reset Filters</string>
 </resources>

@@ -1,6 +1,7 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -18,6 +19,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -66,12 +68,14 @@ fun SubjectsScreen(
             item {
                 AssistChip(
                     onClick = { viewModel.selectSubject(null) },
+                    enabled = uiState.selectedSubject != null,
                     label = { Text(stringResource(id = R.string.all_subjects)) }
                 )
             }
             items(uiState.availableSubjects) { subject ->
                 AssistChip(
                     onClick = { viewModel.selectSubject(subject) },
+                    enabled = uiState.selectedSubject != subject,
                     label = { Text(subject) }
                 )
             }
@@ -90,15 +94,28 @@ fun SubjectsScreen(
             item {
                 AssistChip(
                     onClick = { viewModel.selectClassLevel(null) },
+                    enabled = uiState.selectedClassLevel != null,
                     label = { Text(stringResource(id = R.string.all_classes)) }
                 )
             }
             items(uiState.availableClassLevels) { classLevel ->
                 AssistChip(
                     onClick = { viewModel.selectClassLevel(classLevel) },
+                    enabled = uiState.selectedClassLevel != classLevel,
                     label = { Text(classLevel) }
                 )
             }
+        }
+
+        TextButton(
+            onClick = {
+                viewModel.selectClassLevel(null)
+                viewModel.selectSubject(null)
+                viewModel.updateSearchQuery("")
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(id = R.string.reset_filters))
         }
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
@@ -122,7 +139,9 @@ fun SubjectsScreen(
                         key = { it.id }
                     ) { topic ->
                         Card(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateContentSize(),
                             onClick = {
                                 navController.navigate("resource/${topic.id}")
                             }
