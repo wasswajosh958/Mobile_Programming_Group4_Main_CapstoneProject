@@ -51,7 +51,7 @@ interface TopicDao {
     }
 
     // Teaching resources
-    @Query("SELECT * FROM teaching_resources WHERE topicId = :topicId ORDER BY id DESC")
+    @Query("SELECT * FROM teaching_resources WHERE topicId = :topicId ORDER BY title")
     fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

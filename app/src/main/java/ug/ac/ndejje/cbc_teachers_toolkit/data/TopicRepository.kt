@@ -54,7 +54,9 @@ class TopicRepository(
         val parsed = ResourceIndexParser.parse(json)
 
         val entities = parsed.items.map { item ->
+            val key = "${item.topicId}|${item.type}|${item.url}"
             TeachingResourceEntity(
+                key = key,
                 topicId = item.topicId,
                 title = item.title,
                 type = item.type,

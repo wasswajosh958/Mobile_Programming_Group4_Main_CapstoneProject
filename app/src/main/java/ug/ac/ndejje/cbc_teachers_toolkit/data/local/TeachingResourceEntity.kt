@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "teaching_resources")
 data class TeachingResourceEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val key: String,
     val topicId: Int,
     val title: String,
     val type: String, // "NCDC_WEB", "VIDEO", "PDF_LINK", "OTHER"
