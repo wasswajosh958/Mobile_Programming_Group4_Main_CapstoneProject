@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "updatedAtIso": "2026-04-26T00:00:00Z",
+  "items": [
+    { "topicId": 1, "title": "NCDC: Classification of Living Things (S1 Biology)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Biology+S1+Classification+of+Living+Things", "source": "NCDC" },
+    { "topicId": 2, "title": "NCDC: Nutrition in Plants and Animals (S2 Biology)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Biology+S2+Nutrition+in+Plants+and+Animals", "source": "NCDC" },
+    { "topicId": 3, "title": "NCDC: Human Reproductive System (S3 Biology)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Biology+S3+Human+Reproductive+System", "source": "NCDC" },
+    { "topicId": 4, "title": "NCDC: Ecology and Environmental Conservation (S4 Biology)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Biology+S4+Ecology+and+Environmental+Conservation", "source": "NCDC" },
+
+    { "topicId": 5, "title": "NCDC: Sets and Venn Diagrams (S1 Mathematics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Mathematics+S1+Sets+and+Venn+Diagrams", "source": "NCDC" },
+    { "topicId": 6, "title": "NCDC: Linear Equations (S2 Mathematics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Mathematics+S2+Linear+Equations", "source": "NCDC" },
+    { "topicId": 7, "title": "NCDC: Quadratic Expressions (S3 Mathematics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Mathematics+S3+Quadratic+Expressions", "source": "NCDC" },
+    { "topicId": 8, "title": "NCDC: Statistics and Probability (S4 Mathematics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Mathematics+S4+Statistics+and+Probability", "source": "NCDC" },
+
+    { "topicId": 9, "title": "NCDC: Grammar and Sentence Structure (S1 English)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+English+S1+Grammar+and+Sentence+Structure", "source": "NCDC" },
+    { "topicId": 10, "title": "NCDC: Composition Writing (S2 English)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+English+S2+Composition+Writing", "source": "NCDC" },
+    { "topicId": 11, "title": "NCDC: Poetry Interpretation (S3 English)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+English+S3+Poetry+Interpretation", "source": "NCDC" },
+    { "topicId": 12, "title": "NCDC: Oral Communication Skills (S4 English)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+English+S4+Oral+Communication+Skills", "source": "NCDC" },
+
+    { "topicId": 13, "title": "NCDC: States of Matter (S1 Chemistry)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Chemistry+S1+States+of+Matter", "source": "NCDC" },
+    { "topicId": 14, "title": "NCDC: Chemical Bonding (S2 Chemistry)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Chemistry+S2+Chemical+Bonding", "source": "NCDC" },
+    { "topicId": 15, "title": "NCDC: Acids, Bases and Salts (S3 Chemistry)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Chemistry+S3+Acids+Bases+and+Salts", "source": "NCDC" },
+    { "topicId": 16, "title": "NCDC: Organic Chemistry Basics (S4 Chemistry)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Chemistry+S4+Organic+Chemistry+Basics", "source": "NCDC" },
+
+    { "topicId": 17, "title": "NCDC: Force and Motion (S1 Physics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Physics+S1+Force+and+Motion", "source": "NCDC" },
+    { "topicId": 18, "title": "NCDC: Work, Energy and Power (S2 Physics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Physics+S2+Work+Energy+and+Power", "source": "NCDC" },
+    { "topicId": 19, "title": "NCDC: Electricity and Circuits (S3 Physics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Physics+S3+Electricity+and+Circuits", "source": "NCDC" },
+    { "topicId": 20, "title": "NCDC: Waves, Light and Sound (S4 Physics)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Physics+S4+Waves+Light+and+Sound", "source": "NCDC" },
+
+    { "topicId": 21, "title": "NCDC: Early Communities in East Africa (S1 History & Political Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+History+Political+Education+S1+Early+Communities+in+East+Africa", "source": "NCDC" },
+    { "topicId": 22, "title": "NCDC: Colonial Rule in Uganda (S2 History & Political Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+History+Political+Education+S2+Colonial+Rule+in+Uganda", "source": "NCDC" },
+    { "topicId": 23, "title": "NCDC: Nationalism and Independence (S3 History & Political Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+History+Political+Education+S3+Nationalism+and+Independence", "source": "NCDC" },
+    { "topicId": 24, "title": "NCDC: Constitutional and Civic Governance (S4 History & Political Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+History+Political+Education+S4+Constitutional+and+Civic+Governance", "source": "NCDC" },
+
+    { "topicId": 25, "title": "NCDC: Map Work Fundamentals (S1 Geography)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Geography+S1+Map+Work+Fundamentals", "source": "NCDC" },
+    { "topicId": 26, "title": "NCDC: Weather and Climate (S2 Geography)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Geography+S2+Weather+and+Climate", "source": "NCDC" },
+    { "topicId": 27, "title": "NCDC: Population and Settlement (S3 Geography)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Geography+S3+Population+and+Settlement", "source": "NCDC" },
+    { "topicId": 28, "title": "NCDC: Natural Resources and Development (S4 Geography)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Geography+S4+Natural+Resources+and+Development", "source": "NCDC" },
+
+    { "topicId": 29, "title": "NCDC: Business Ideas and Opportunities (S1 Entrepreneurship)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Entrepreneurship+S1+Business+Ideas+and+Opportunities", "source": "NCDC" },
+    { "topicId": 30, "title": "NCDC: Starting and Managing a Small Business (S2 Entrepreneurship)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Entrepreneurship+S2+Starting+and+Managing+a+Small+Business", "source": "NCDC" },
+    { "topicId": 31, "title": "NCDC: Marketing and Customer Care (S3 Entrepreneurship)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Entrepreneurship+S3+Marketing+and+Customer+Care", "source": "NCDC" },
+    { "topicId": 32, "title": "NCDC: Financial Literacy and Record Keeping (S4 Entrepreneurship)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Entrepreneurship+S4+Financial+Literacy+and+Record+Keeping", "source": "NCDC" },
+
+    { "topicId": 33, "title": "NCDC: Greetings and Basic Conversation (S1 Kiswahili)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Kiswahili+S1+Greetings+and+Basic+Conversation", "source": "NCDC" },
+    { "topicId": 34, "title": "NCDC: Reading and Listening Comprehension (S2 Kiswahili)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Kiswahili+S2+Reading+and+Listening+Comprehension", "source": "NCDC" },
+    { "topicId": 35, "title": "NCDC: Insha Writing (S3 Kiswahili)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Kiswahili+S3+Insha+Writing", "source": "NCDC" },
+    { "topicId": 36, "title": "NCDC: Public Speaking and Debate (S4 Kiswahili)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Kiswahili+S4+Public+Speaking+and+Debate", "source": "NCDC" },
+
+    { "topicId": 37, "title": "NCDC: Values and Moral Formation (S1 Religious Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Religious+Education+S1+Values+and+Moral+Formation", "source": "NCDC" },
+    { "topicId": 38, "title": "NCDC: Sacred Texts and Interpretation (S2 Religious Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Religious+Education+S2+Sacred+Texts+and+Interpretation", "source": "NCDC" },
+    { "topicId": 39, "title": "NCDC: Faith, Leadership and Society (S3 Religious Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Religious+Education+S3+Faith+Leadership+and+Society", "source": "NCDC" },
+    { "topicId": 40, "title": "NCDC: Ethics, Peace and Social Justice (S4 Religious Education)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Religious+Education+S4+Ethics+Peace+and+Social+Justice", "source": "NCDC" },
+
+    { "topicId": 41, "title": "NCDC: Crop Production Basics (S1 Agriculture)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Agriculture+S1+Crop+Production+Basics", "source": "NCDC" },
+    { "topicId": 42, "title": "NCDC: Soil Fertility and Conservation (S2 Agriculture)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Agriculture+S2+Soil+Fertility+and+Conservation", "source": "NCDC" },
+    { "topicId": 43, "title": "NCDC: Animal Husbandry (S3 Agriculture)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Agriculture+S3+Animal+Husbandry", "source": "NCDC" },
+    { "topicId": 44, "title": "NCDC: Agribusiness and Farm Management (S4 Agriculture)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+Agriculture+S4+Agribusiness+and+Farm+Management", "source": "NCDC" },
+
+    { "topicId": 45, "title": "NCDC: Computer Fundamentals (S1 ICT)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+ICT+S1+Computer+Fundamentals", "source": "NCDC" },
+    { "topicId": 46, "title": "NCDC: Word Processing and Spreadsheets (S2 ICT)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+ICT+S2+Word+Processing+and+Spreadsheets", "source": "NCDC" },
+    { "topicId": 47, "title": "NCDC: Internet Safety and Research Skills (S3 ICT)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+ICT+S3+Internet+Safety+and+Research+Skills", "source": "NCDC" },
+    { "topicId": 48, "title": "NCDC: Introduction to Programming (S4 ICT)", "type": "NCDC_WEB", "url": "https://www.google.com/search?q=site:ncdc.go.ug+ICT+S4+Introduction+to+Programming", "source": "NCDC" }
+  ]
+}
