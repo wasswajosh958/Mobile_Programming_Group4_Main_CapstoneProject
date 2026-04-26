@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,6 +62,7 @@ fun ResourceDetailScreen(
     val uiState = viewModel.uiState.collectAsState().value
     val persistedNote = uiState.notes[topicId].orEmpty()
     val isFavorite = uiState.favorites.contains(topicId)
+    val resources = viewModel.observeResourcesForTopic(topicId).collectAsState(initial = emptyList()).value
     var noteDraft by remember(topicId) { mutableStateOf("") }
     var showSavedHint by remember { mutableStateOf(false) }
     var showLessonPlan by rememberSaveable(topicId) { mutableStateOf(true) }
@@ -136,6 +139,33 @@ fun ResourceDetailScreen(
                 }
             ) {
                 Text(text = stringResource(id = R.string.open_on_ncdc))
+            }
+
+            if (resources.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
+                    Text(
+                        text = stringResource(id = R.string.downloaded_resources),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    resources.forEach { resource ->
+                        OutlinedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = { openUrl(context, resource.url) }
+                        ) {
+                            Icon(
+                                imageVector = if (resource.type == "VIDEO") Icons.Filled.PlayCircle else Icons.Filled.Link,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
+                            Text(text = resource.title)
+                        }
+                    }
+                }
+            } else {
+                Text(
+                    text = stringResource(id = R.string.no_downloaded_resources),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
 
             DetailSectionCard(

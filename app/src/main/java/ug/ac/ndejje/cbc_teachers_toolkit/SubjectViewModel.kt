@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ug.ac.ndejje.cbc_teachers_toolkit.data.TopicRepository
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 
 data class SubjectsUiState(
@@ -143,6 +144,8 @@ class SubjectViewModel(
     fun topicById(topicId: Int): Topic? {
         return uiState.value.allTopics.firstOrNull { it.id == topicId }
     }
+
+    fun observeResourcesForTopic(topicId: Int) = repository.observeResourcesForTopic(topicId)
 
     class Factory(
         private val repository: TopicRepository
