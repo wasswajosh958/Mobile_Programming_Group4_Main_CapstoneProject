@@ -12,7 +12,16 @@ fun AppNavigation() {
     val navController = rememberNavController()
     val viewModel = appViewModel()
 
-    NavHost(navController = navController, startDestination = "home") {
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash") {
+            SplashScreen(
+                onDone = {
+                    navController.navigate("home") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("home") { HomeScreen(navController, viewModel) }
         composable("subjects") { SubjectsScreen(navController, viewModel) }
         composable("library") { LibraryScreen(navController, viewModel) }
