@@ -28,4 +28,10 @@
     <string name="notes_count">Notes: %1$d</string>
     <string name="resource_title_format">%1$s (%2$s %3$s)</string>
     <string name="loading_topics">Loading topics...</string>
+    <string name="open_library">Open My Library</string>
+    <string name="my_library">My Library</string>
+    <string name="library_summary">Favorites: %1$d • Notes: %2$d</string>
+    <string name="library_empty">No favorites or notes yet. Open a topic and save one.</string>
+    <string name="favorite_topics_title">Favorite Topics</string>
+    <string name="noted_topics_title">Topics With Notes</string>
 </resources>
