@@ -36,4 +36,6 @@
     <string name="favorite_topics_title">Favorite Topics</string>
     <string name="noted_topics_title">Topics With Notes</string>
     <string name="reset_filters">Reset Filters</string>
+    <string name="expand_section">Expand section</string>
+    <string name="collapse_section">Collapse section</string>
 </resources>

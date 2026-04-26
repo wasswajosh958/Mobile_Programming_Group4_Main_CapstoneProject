@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -56,6 +60,10 @@ fun ResourceDetailScreen(
     val isFavorite = uiState.favorites.contains(topicId)
     var noteDraft by remember(topicId) { mutableStateOf("") }
     var showSavedHint by remember { mutableStateOf(false) }
+    var showLessonPlan by rememberSaveable(topicId) { mutableStateOf(true) }
+    var showProjectIdeas by rememberSaveable(topicId) { mutableStateOf(true) }
+    var showAssessment by rememberSaveable(topicId) { mutableStateOf(true) }
+    var showTeachingTips by rememberSaveable(topicId) { mutableStateOf(true) }
 
     LaunchedEffect(persistedNote, topicId) {
         noteDraft = persistedNote
@@ -110,30 +118,33 @@ fun ResourceDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 3 })
-            ) {
-                Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                    Text(text = stringResource(id = R.string.lesson_plan), style = MaterialTheme.typography.titleLarge)
-                    Text(text = topic.lessonPlan, style = MaterialTheme.typography.bodyMedium)
-                }
-            }
+            DetailSectionCard(
+                title = stringResource(id = R.string.lesson_plan),
+                content = topic.lessonPlan,
+                expanded = showLessonPlan,
+                onToggle = { showLessonPlan = !showLessonPlan }
+            )
 
-            Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                Text(text = stringResource(id = R.string.project_ideas), style = MaterialTheme.typography.titleLarge)
-                Text(text = topic.projectIdeas, style = MaterialTheme.typography.bodyMedium)
-            }
+            DetailSectionCard(
+                title = stringResource(id = R.string.project_ideas),
+                content = topic.projectIdeas,
+                expanded = showProjectIdeas,
+                onToggle = { showProjectIdeas = !showProjectIdeas }
+            )
 
-            Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                Text(text = stringResource(id = R.string.assessment_rubric), style = MaterialTheme.typography.titleLarge)
-                Text(text = topic.assessmentRubric, style = MaterialTheme.typography.bodyMedium)
-            }
+            DetailSectionCard(
+                title = stringResource(id = R.string.assessment_rubric),
+                content = topic.assessmentRubric,
+                expanded = showAssessment,
+                onToggle = { showAssessment = !showAssessment }
+            )
 
-            Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                Text(text = stringResource(id = R.string.teaching_tips), style = MaterialTheme.typography.titleLarge)
-                Text(text = topic.teachingTips, style = MaterialTheme.typography.bodyMedium)
-            }
+            DetailSectionCard(
+                title = stringResource(id = R.string.teaching_tips),
+                content = topic.teachingTips,
+                expanded = showTeachingTips,
+                onToggle = { showTeachingTips = !showTeachingTips }
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -180,6 +191,44 @@ fun ResourceDetailScreen(
                     style = MaterialTheme.typography.bodySmall
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun DetailSectionCard(
+    title: String,
+    content: String,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize()
+            .clickable { onToggle() },
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = title, style = MaterialTheme.typography.titleLarge)
+            Icon(
+                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                contentDescription = if (expanded) {
+                    stringResource(id = R.string.collapse_section)
+                } else {
+                    stringResource(id = R.string.expand_section)
+                }
+            )
+        }
+        AnimatedVisibility(
+            visible = expanded,
+            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 5 }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 5 })
+        ) {
+            Text(text = content, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
