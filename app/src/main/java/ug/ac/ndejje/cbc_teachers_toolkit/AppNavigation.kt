@@ -25,6 +25,7 @@ fun AppNavigation() {
         composable("home") { HomeScreen(navController, viewModel) }
         composable("subjects") { SubjectsScreen(navController, viewModel) }
         composable("library") { LibraryScreen(navController, viewModel) }
+        composable("about") { AboutScreen(navController) }
         composable(
             route = "resource/{topicId}",
             arguments = listOf(navArgument("topicId") { type = NavType.IntType })

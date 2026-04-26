@@ -31,6 +31,7 @@
     <string name="splash_subtitle">Offline Companion for CBC Teaching</string>
     <string name="open_library">Open My Library</string>
     <string name="my_library">My Library</string>
+    <string name="open_about">About Project</string>
     <string name="library_summary">Favorites: %1$d • Notes: %2$d</string>
     <string name="library_empty">No favorites or notes yet. Open a topic and save one.</string>
     <string name="favorite_topics_title">Favorite Topics</string>
@@ -38,4 +39,15 @@
     <string name="reset_filters">Reset Filters</string>
     <string name="expand_section">Expand section</string>
     <string name="collapse_section">Collapse section</string>
+    <string name="about_title">About CBC Teachers\' Toolkit</string>
+    <string name="about_subtitle">This app supports Ndejje community student-teachers during CBC lesson preparation and teaching practice.</string>
+    <string name="about_bullet">• %1$s</string>
+    <string name="about_item_kotlin_compose">Built with Kotlin and Jetpack Compose</string>
+    <string name="about_item_mvvm">Uses MVVM architecture with ViewModel state flows</string>
+    <string name="about_item_navigation">Includes multi-screen Navigation Compose flow</string>
+    <string name="about_item_room">Stores topics, favorites, and notes in Room</string>
+    <string name="about_item_lazy_lists">Uses LazyColumn/LazyRow for dynamic lists</string>
+    <string name="about_item_testing">Includes unit and UI tests for core flows</string>
+    <string name="about_item_animations">Applies animations on splash and content transitions</string>
+    <string name="back_to_home">Back</string>
 </resources>
