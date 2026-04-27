@@ -9,3 +9,9 @@ fun appViewModel(): SubjectViewModel {
     val app = LocalContext.current.applicationContext as CbcToolkitApplication
     return viewModel(factory = SubjectViewModel.Factory(app.container.topicRepository))
 }
+
+@Composable
+fun authViewModel(): AuthViewModel {
+    val app = LocalContext.current.applicationContext as CbcToolkitApplication
+    return viewModel(factory = AuthViewModel.Factory(app.container.authRepository))
+}

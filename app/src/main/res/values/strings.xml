@@ -93,4 +93,15 @@
     <string name="scheme_summary_format">%1$s - %2$s | %3$s Week %4$d</string>
     <string name="scheme_teacher_format">Teacher: %1$s</string>
     <string name="share_scheme">Share Scheme</string>
+    <string name="login_title">Teacher Login</string>
+    <string name="login_subtitle">Sign in to access your offline teaching workspace.</string>
+    <string name="full_name_label">Full Name</string>
+    <string name="username_label">Username</string>
+    <string name="password_label">Password</string>
+    <string name="login_button">Login</string>
+    <string name="register_button">Create Account</string>
+    <string name="switch_to_register">Need an account? Register</string>
+    <string name="switch_to_login">Already have an account? Login</string>
+    <string name="default_login_hint">Demo account: username teacher, password 1234</string>
+    <string name="logout_button">Logout</string>
 </resources>

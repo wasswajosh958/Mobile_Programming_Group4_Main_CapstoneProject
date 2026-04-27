@@ -36,7 +36,8 @@ data class SubjectItem(val name: String)
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: SubjectViewModel
+    viewModel: SubjectViewModel,
+    onLogout: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val subjects = uiState.availableSubjects.map { SubjectItem(it) }
@@ -107,6 +108,12 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(id = R.string.open_scheme_builder))
+        }
+        TextButton(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(id = R.string.logout_button))
         }
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))

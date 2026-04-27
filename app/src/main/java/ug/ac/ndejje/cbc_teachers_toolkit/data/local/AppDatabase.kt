@@ -11,13 +11,15 @@ import androidx.room.RoomDatabase
         FavoriteEntity::class,
         NoteEntity::class,
         TeachingResourceEntity::class,
-        SchemeOfWorkEntity::class
+        SchemeOfWorkEntity::class,
+        UserEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun topicDao(): TopicDao
+    abstract fun userDao(): UserDao
 
     companion object {
         @Volatile

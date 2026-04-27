@@ -1,6 +1,8 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.compose.NavHost
@@ -11,18 +13,33 @@ import androidx.navigation.compose.rememberNavController
 fun AppNavigation() {
     val navController = rememberNavController()
     val viewModel = appViewModel()
+    val authViewModel = authViewModel()
+    val currentUser by authViewModel.currentUser.collectAsState()
 
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {
             SplashScreen(
                 onDone = {
-                    navController.navigate("home") {
+                    val destination = if (currentUser == null) "login" else "home"
+                    navController.navigate(destination) {
                         popUpTo("splash") { inclusive = true }
                     }
                 }
             )
         }
-        composable("home") { HomeScreen(navController, viewModel) }
+        composable("login") { LoginScreen(authViewModel) }
+        composable("home") {
+            HomeScreen(
+                navController = navController,
+                viewModel = viewModel,
+                onLogout = {
+                    authViewModel.logout()
+                    navController.navigate("login") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("subjects") { SubjectsScreen(navController, viewModel) }
         composable("library") { LibraryScreen(navController, viewModel) }
         composable("about") { AboutScreen(navController) }
