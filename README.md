@@ -17,9 +17,13 @@ An Android app built with Kotlin and Jetpack Compose to support CBC lesson prepa
   - Assessment rubric
   - Teaching tips
 - Favorites and teacher notes persisted with Room.
+- Scheme of Work builder with in-app design guide and offline saves.
+- Share saved schemes via Android share sheet.
 - `My Library` screen for quick access to favorite and noted topics.
 - Room database seeding for offline-first usage.
-- Animations across splash, list entry, loading content, and detail interactions.
+- Manual resource update flow: download links while online and use them offline.
+- Downloaded topic resources include official links, teaching video links, and notes-search links.
+- Animations across splash, list entry, loading content, detail interactions, and scheme guide transitions.
 
 ## Technical Stack
 - Kotlin
@@ -34,11 +38,13 @@ An Android app built with Kotlin and Jetpack Compose to support CBC lesson prepa
 - `SubjectsScreen`
 - `LibraryScreen`
 - `AboutScreen`
+- `UpdatesScreen`
+- `SchemeBuilderScreen`
 - `ResourceDetailScreen`
 
 ## Testing Summary
 - `toggleFavorite adds and removes topic id`
-- `searchQuery filters topics by title`
+- `observeTopics returns seeded topics`
 - `saveNote stores note in uiState map`
 - `splashTransitionsToHomeScreen` (instrumentation)
 
@@ -51,6 +57,7 @@ Tests are located in `SubjectViewModelTest` and `AppNavigationTest`.
 - Navigation with 3+ screens: implemented (`Splash`, `Home`, `Subjects`, `Library`, `Detail`).
 - State management: Compose state + `StateFlow`.
 - Persistence: Room entities/DAO/repository (topics, favorites, notes).
+- Persistence: Room entities/DAO/repository (topics, favorites, notes, resources, schemes).
 - Tests: unit tests + one instrumentation navigation test.
 - Clean `MainActivity`: entry point only.
 

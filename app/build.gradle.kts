@@ -1,21 +1,18 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.google.ksp)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "ug.ac.ndejje.cbc_teachers_toolkit"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "ug.ac.ndejje.cbc_teachers_toolkit"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -38,6 +35,9 @@ android {
     buildFeatures {
         compose = true
     }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
@@ -50,10 +50,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.browser)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")
     implementation("androidx.navigation:navigation-compose:2.9.7")
-    implementation("androidx.browser:browser:1.9.0")
     implementation("androidx.room:room-runtime:2.8.0")
     implementation("androidx.room:room-ktx:2.8.0")
     ksp("androidx.room:room-compiler:2.8.0")
