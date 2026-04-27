@@ -28,9 +28,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import ug.ac.ndejje.cbc_teachers_toolkit.util.shareScheme
 
 @Composable
 fun SchemeBuilderScreen(
@@ -41,6 +43,7 @@ fun SchemeBuilderScreen(
     val draft by viewModel.schemeDraftState.collectAsState()
     val saveStatus by viewModel.schemeSaveStatus.collectAsState()
     val schemes by viewModel.schemes.collectAsState()
+    val context = LocalContext.current
     var showGuide by remember { mutableStateOf(true) }
 
     LaunchedEffect(topicId) {
@@ -242,6 +245,12 @@ fun SchemeBuilderScreen(
                             text = stringResource(id = R.string.scheme_teacher_format, scheme.teacherName),
                             style = MaterialTheme.typography.bodySmall
                         )
+                        OutlinedButton(
+                            onClick = { shareScheme(context, scheme) },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(text = stringResource(id = R.string.share_scheme))
+                        }
                     }
                 }
             }
