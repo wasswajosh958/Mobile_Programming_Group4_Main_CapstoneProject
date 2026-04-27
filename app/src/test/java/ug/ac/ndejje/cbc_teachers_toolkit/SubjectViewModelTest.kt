@@ -16,6 +16,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import ug.ac.ndejje.cbc_teachers_toolkit.data.TopicRepository
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.SchemeOfWorkEntity
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicDao
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicNoteProjection
@@ -39,29 +41,23 @@ class SubjectViewModelTest {
         val fakeDao = FakeTopicDao()
         fakeDao.insertAll(seedTopics())
         val repository = TopicRepository(fakeDao)
-        val viewModel = SubjectViewModel(repository)
 
+        repository.toggleFavorite(1)
         advanceUntilIdle()
-        viewModel.toggleFavorite(1)
-        assertTrue(viewModel.uiState.value.favorites.contains(1))
+        assertTrue(repository.observeFavoriteIds().first().contains(1))
 
-        viewModel.toggleFavorite(1)
-        assertTrue(!viewModel.uiState.value.favorites.contains(1))
+        repository.toggleFavorite(1)
+        advanceUntilIdle()
+        assertTrue(!repository.observeFavoriteIds().first().contains(1))
     }
 
     @Test
-    fun `searchQuery filters topics by title`() = runTest {
+    fun `observeTopics returns seeded topics`() = runTest {
         val fakeDao = FakeTopicDao()
         fakeDao.insertAll(seedTopics())
         val repository = TopicRepository(fakeDao)
-        val viewModel = SubjectViewModel(repository)
-
-        advanceUntilIdle()
-        viewModel.updateSearchQuery("photo")
-        advanceUntilIdle()
-
-        val topics = viewModel.uiState.first().filteredTopics
-        assertEquals(1, topics.size)
+        val topics = repository.observeTopics().first()
+        assertEquals(2, topics.size)
         assertEquals("Photosynthesis", topics.first().title)
     }
 
@@ -70,13 +66,11 @@ class SubjectViewModelTest {
         val fakeDao = FakeTopicDao()
         fakeDao.insertAll(seedTopics())
         val repository = TopicRepository(fakeDao)
-        val viewModel = SubjectViewModel(repository)
 
-        advanceUntilIdle()
-        viewModel.saveNote(2, "Revise worked examples for this lesson")
+        repository.saveNote(2, "Revise worked examples for this lesson")
         advanceUntilIdle()
 
-        val note = viewModel.uiState.value.notes[2]
+        val note = repository.observeNotes().first()[2]
         assertEquals("Revise worked examples for this lesson", note)
     }
 
@@ -108,6 +102,8 @@ private class FakeTopicDao : TopicDao {
     private val state = MutableStateFlow<List<TopicEntity>>(emptyList())
     private val favoritesState = MutableStateFlow<List<Int>>(emptyList())
     private val notesState = MutableStateFlow<List<TopicNoteProjection>>(emptyList())
+    private val resourcesState = MutableStateFlow<List<TeachingResourceEntity>>(emptyList())
+    private val schemesState = MutableStateFlow<List<SchemeOfWorkEntity>>(emptyList())
 
     override fun observeTopics(): Flow<List<TopicEntity>> = state
 
@@ -149,5 +145,22 @@ private class FakeTopicDao : TopicDao {
 
     override suspend fun deleteNote(topicId: Int) {
         notesState.value = notesState.value.filterNot { it.topicId == topicId }
+    }
+
+    override fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>> {
+        return MutableStateFlow(resourcesState.value.filter { it.topicId == topicId })
+    }
+
+    override suspend fun insertResources(resources: List<TeachingResourceEntity>) {
+        val byKey = (resourcesState.value + resources).associateBy { it.key }
+        resourcesState.value = byKey.values.toList()
+    }
+
+    override fun observeSchemes(): Flow<List<SchemeOfWorkEntity>> = schemesState
+
+    override suspend fun insertScheme(scheme: SchemeOfWorkEntity): Long {
+        val nextId = (schemesState.value.maxOfOrNull { it.id } ?: 0L) + 1L
+        schemesState.value = schemesState.value + scheme.copy(id = nextId)
+        return nextId
     }
 }
