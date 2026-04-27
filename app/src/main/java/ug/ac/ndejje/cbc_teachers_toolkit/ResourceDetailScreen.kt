@@ -151,7 +151,14 @@ fun ResourceDetailScreen(
                     resources.forEach { resource ->
                         OutlinedButton(
                             modifier = Modifier.fillMaxWidth(),
-                            onClick = { openUrl(context, resource.url) }
+                            onClick = {
+                                if (resource.type == "VIDEO") {
+                                    val encoded = java.net.URLEncoder.encode(resource.url, "UTF-8")
+                                    navController.navigate("video/$encoded")
+                                } else {
+                                    openUrl(context, resource.url)
+                                }
+                            }
                         ) {
                             Icon(
                                 imageVector = when (resource.type) {

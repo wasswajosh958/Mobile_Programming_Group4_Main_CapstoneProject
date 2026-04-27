@@ -72,15 +72,50 @@ object CbcSeedData {
         title: String
     ): TopicEntity {
         val learnerActivity = "Learners work in groups to solve a practical task related to $title."
+        val lessonPlanText = """
+            Competency focus: By the end of this lesson, learners should apply $title concepts in real contexts.
+            Lesson objectives:
+            1) Define and explain key concepts in $title.
+            2) Demonstrate understanding through classroom activity and peer explanation.
+            3) Apply the concept to local school/community examples.
+
+            Suggested lesson flow:
+            - Starter (5-10 min): prior knowledge questions.
+            - Core (25-30 min): teacher guidance + group activity.
+            - Practice (10-15 min): structured learner task.
+            - Reflection (5 min): exit ticket and recap.
+        """.trimIndent()
+        val projectIdeasText = """
+            Project options for $title:
+            - Design a low-cost teaching aid using local materials.
+            - Present a mini-demonstration in groups.
+            - Create a short class poster summarizing concepts and examples.
+            Output should include written explanation + oral presentation.
+        """.trimIndent()
+        val rubricText = """
+            Assessment rubric (4-point):
+            - Concept accuracy (0-4)
+            - Application to real context (0-4)
+            - Collaboration and participation (0-4)
+            - Communication and presentation clarity (0-4)
+            Total = 16 marks.
+        """.trimIndent()
+        val teachingTipsText = """
+            Teaching guide:
+            - Begin with a local example before introducing theory.
+            - Use learner-centred questioning and pair discussion.
+            - Differentiate tasks for mixed ability groups.
+            - End with quick formative assessment and feedback notes.
+        """.trimIndent()
         return TopicEntity(
             id = id,
             title = title,
             subject = subject,
             classLevel = classLevel,
-            lessonPlan = "Competency focus for $classLevel $subject: $title. $learnerActivity",
-            projectIdeas = "Project: design a simple classroom artifact that demonstrates $title using local materials.",
-            assessmentRubric = "Assess understanding, application, collaboration, and communication on a 4-point scale.",
-            teachingTips = "Start with local examples, guide peer learning, and finish with reflective exit questions."
+            lessonPlan = "$lessonPlanText\n\nClass context: $classLevel $subject\n$learnerActivity",
+            projectIdeas = projectIdeasText,
+            assessmentRubric = rubricText,
+            teachingTips = teachingTipsText
         )
     }
 }

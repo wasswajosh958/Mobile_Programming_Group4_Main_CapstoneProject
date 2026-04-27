@@ -64,6 +64,7 @@
     <string name="update_status_updated">Updated</string>
     <string name="update_status_failed">Failed</string>
     <string name="updated_resources_count">Downloaded %1$d resources for offline use.</string>
+    <string name="video_player_title">Topic Video</string>
     <string name="open_scheme_builder">Scheme Builder</string>
     <string name="open_scheme_for_topic">Create Scheme From This Topic</string>
     <string name="scheme_builder_title">Scheme of Work Builder</string>

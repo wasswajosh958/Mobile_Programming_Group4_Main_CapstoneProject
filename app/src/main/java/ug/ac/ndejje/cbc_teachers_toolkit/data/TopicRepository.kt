@@ -36,6 +36,9 @@ class TopicRepository(
         if (topicDao.countTopics() == 0) {
             topicDao.insertAll(CbcSeedData.topics)
         }
+        if (topicDao.countResources() == 0) {
+            topicDao.insertResources(buildOfflineStarterResources())
+        }
     }
 
     fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>> {
@@ -111,6 +114,52 @@ class TopicRepository(
                     title = "Teaching notes: ${topic.title}",
                     type = "NOTES",
                     url = notesQuery,
+                    source = "NCDC/WEB"
+                )
+            )
+        }
+    }
+
+    private suspend fun buildOfflineStarterResources(): List<TeachingResourceEntity> {
+        return topicDao.getTopics().flatMap { topic ->
+            val videoQuery =
+                "https://www.youtube.com/results?search_query=" +
+                    java.net.URLEncoder.encode("${topic.subject} ${topic.classLevel} ${topic.title} lesson", "UTF-8")
+            val notesQuery =
+                "https://www.google.com/search?q=" +
+                    java.net.URLEncoder.encode(
+                        "site:ncdc.go.ug ${topic.subject} ${topic.classLevel} ${topic.title} notes",
+                        "UTF-8"
+                    )
+            val pdfQuery =
+                "https://www.google.com/search?q=" +
+                    java.net.URLEncoder.encode(
+                        "site:ncdc.go.ug filetype:pdf ${topic.subject} ${topic.classLevel} ${topic.title}",
+                        "UTF-8"
+                    )
+            listOf(
+                TeachingResourceEntity(
+                    key = "${topic.id}|VIDEO|$videoQuery",
+                    topicId = topic.id,
+                    title = "Video tutorial: ${topic.title}",
+                    type = "VIDEO",
+                    url = videoQuery,
+                    source = "WEB"
+                ),
+                TeachingResourceEntity(
+                    key = "${topic.id}|NOTES|$notesQuery",
+                    topicId = topic.id,
+                    title = "Teacher notes: ${topic.title}",
+                    type = "NOTES",
+                    url = notesQuery,
+                    source = "NCDC/WEB"
+                ),
+                TeachingResourceEntity(
+                    key = "${topic.id}|PDF_LINK|$pdfQuery",
+                    topicId = topic.id,
+                    title = "Downloadable PDF references: ${topic.title}",
+                    type = "PDF_LINK",
+                    url = pdfQuery,
                     source = "NCDC/WEB"
                 )
             )

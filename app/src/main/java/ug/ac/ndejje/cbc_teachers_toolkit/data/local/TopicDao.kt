@@ -60,6 +60,9 @@ interface TopicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertResources(resources: List<TeachingResourceEntity>)
 
+    @Query("SELECT COUNT(*) FROM teaching_resources")
+    suspend fun countResources(): Int
+
     // Schemes of work
     @Query("SELECT * FROM schemes_of_work ORDER BY subject, classLevel, term, week")
     fun observeSchemes(): Flow<List<SchemeOfWorkEntity>>

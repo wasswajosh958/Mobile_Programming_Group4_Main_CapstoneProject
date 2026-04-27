@@ -56,6 +56,13 @@ fun AppNavigation() {
         composable("about") { AboutScreen(navController) }
         composable("updates") { UpdatesScreen(navController, viewModel) }
         composable(
+            route = "video/{encodedUrl}",
+            arguments = listOf(navArgument("encodedUrl") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encodedUrl = backStackEntry.arguments?.getString("encodedUrl").orEmpty()
+            VideoPlayerScreen(encodedUrl = encodedUrl)
+        }
+        composable(
             route = "scheme?topicId={topicId}",
             arguments = listOf(
                 navArgument("topicId") {

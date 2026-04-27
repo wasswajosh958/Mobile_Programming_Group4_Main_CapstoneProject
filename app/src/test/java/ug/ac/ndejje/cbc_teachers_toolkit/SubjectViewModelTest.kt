@@ -119,6 +119,8 @@ private class FakeTopicDao : TopicDao {
 
     override suspend fun countTopics(): Int = state.value.size
 
+    override suspend fun countResources(): Int = resourcesState.value.size
+
     override fun observeFavoriteIds(): Flow<List<Int>> = favoritesState
 
     override suspend fun getNote(topicId: Int): String? {
