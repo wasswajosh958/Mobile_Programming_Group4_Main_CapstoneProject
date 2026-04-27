@@ -1,22 +1,44 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 
@@ -26,7 +48,7 @@ fun UpdatesScreen(
     viewModel: SubjectViewModel
 ) {
     val updates by viewModel.updatesState.collectAsState()
-    UpdatesScreenContent(
+    UpdatesContent(
         updates = updates,
         onUpdateNow = { viewModel.updateResourcesNow() },
         onBack = { navController.popBackStack() }
@@ -34,7 +56,7 @@ fun UpdatesScreen(
 }
 
 @Composable
-private fun UpdatesScreenContent(
+fun UpdatesContent(
     updates: UpdatesUiState,
     onUpdateNow: () -> Unit,
     onBack: () -> Unit
@@ -42,66 +64,189 @@ private fun UpdatesScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(dimensionResource(id = R.dimen.padding_medium)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Text(text = stringResource(id = R.string.updates_title), style = MaterialTheme.typography.headlineSmall)
-        Text(text = stringResource(id = R.string.updates_subtitle), style = MaterialTheme.typography.bodyMedium)
-
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
-
-        val statusText = when (updates.status) {
-            UpdateStatus.IDLE -> stringResource(id = R.string.update_status_idle)
-            UpdateStatus.UPDATING -> stringResource(id = R.string.update_status_updating)
-            UpdateStatus.UPDATED -> stringResource(id = R.string.update_status_updated)
-            UpdateStatus.FAILED -> stringResource(id = R.string.update_status_failed)
-        }
-        Text(
-            text = stringResource(id = R.string.updates_status_format, statusText),
-            style = MaterialTheme.typography.bodyMedium
+        // --- Header Section ---
+        val headerGradient = Brush.verticalGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+            )
         )
-        if (updates.downloadedCount > 0) {
-            Text(
-                text = stringResource(id = R.string.updated_resources_count, updates.downloadedCount),
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-        if (updates.errorMessage.isNotBlank()) {
-            Text(
-                text = updates.errorMessage,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error
-            )
-        }
 
-        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
-
-        OutlinedButton(
-            onClick = onUpdateNow,
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !updates.isUpdating
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .background(brush = headerGradient)
         ) {
-            Text(text = stringResource(id = R.string.update_resources_button))
+            Column(
+                modifier = Modifier.padding(
+                    start = 12.dp,
+                    end = 20.dp,
+                    top = 16.dp,
+                    bottom = 32.dp
+                )
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Column {
+                        Text(
+                            text = stringResource(id = R.string.updates_title),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.updates_subtitle),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
         }
 
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = stringResource(id = R.string.back))
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Status Card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    val (statusText, icon, iconColor) = when (updates.status) {
+                        UpdateStatus.IDLE -> Triple(stringResource(id = R.string.update_status_idle), Icons.Default.Sync, MaterialTheme.colorScheme.primary)
+                        UpdateStatus.UPDATING -> Triple(stringResource(id = R.string.update_status_updating), Icons.Default.CloudDownload, MaterialTheme.colorScheme.secondary)
+                        UpdateStatus.UPDATED -> Triple(stringResource(id = R.string.update_status_updated), Icons.Default.CloudDone, MaterialTheme.colorScheme.primary)
+                        UpdateStatus.FAILED -> Triple(stringResource(id = R.string.update_status_failed), Icons.Default.CloudOff, MaterialTheme.colorScheme.error)
+                    }
+
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = iconColor
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text(
+                        text = statusText,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = iconColor
+                    )
+                    
+                    if (updates.downloadedCount > 0) {
+                        Text(
+                            text = stringResource(id = R.string.updated_resources_count, updates.downloadedCount),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                    
+                    if (updates.errorMessage.isNotBlank()) {
+                        Text(
+                            text = updates.errorMessage,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(top = 12.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Button(
+                onClick = onUpdateNow,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                enabled = !updates.isUpdating
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (updates.isUpdating) {
+                        Icon(Icons.Default.Sync, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = stringResource(id = R.string.update_resources_button),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.back),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun UpdatesScreenPreview() {
     CbcTeachersToolkitTheme {
-        UpdatesScreenContent(
+        UpdatesContent(
             updates = UpdatesUiState(
                 isUpdating = false,
                 status = UpdateStatus.UPDATED,
                 downloadedCount = 96
+            ),
+            onUpdateNow = {},
+            onBack = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun UpdatesLoadingPreview() {
+    CbcTeachersToolkitTheme {
+        UpdatesContent(
+            updates = UpdatesUiState(
+                isUpdating = true,
+                status = UpdateStatus.UPDATING,
+                downloadedCount = 45
             ),
             onUpdateNow = {},
             onBack = {}

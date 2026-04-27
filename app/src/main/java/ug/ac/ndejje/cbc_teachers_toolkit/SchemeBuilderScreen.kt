@@ -1,21 +1,45 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AssistChip
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,11 +48,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.SchemeOfWorkEntity
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.SuccessGreen
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.SuccessGreenContainer
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.WarningOrange
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.WarningOrangeContainer
 import ug.ac.ndejje.cbc_teachers_toolkit.util.shareScheme
 
 @Composable
@@ -40,8 +77,6 @@ fun SchemeBuilderScreen(
     val draft by viewModel.schemeDraftState.collectAsState()
     val saveStatus by viewModel.schemeSaveStatus.collectAsState()
     val schemes by viewModel.schemes.collectAsState()
-    val context = LocalContext.current
-    var showGuide by remember { mutableStateOf(true) }
 
     LaunchedEffect(topicId) {
         if (topicId > 0) {
@@ -49,28 +84,102 @@ fun SchemeBuilderScreen(
         }
     }
 
-    LazyColumn(
+    SchemeBuilderContent(
+        draft = draft,
+        saveStatus = saveStatus,
+        schemes = schemes,
+        onBackClick = { navController.popBackStack() },
+        onUpdateDraft = { viewModel.updateSchemeDraft(it) },
+        onSaveScheme = { viewModel.saveSchemeDraft() },
+        onClearStatus = { viewModel.clearSchemeSaveStatus() }
+    )
+}
+
+@Composable
+fun SchemeBuilderContent(
+    draft: SchemeDraftUiState,
+    saveStatus: SchemeSaveStatus,
+    schemes: List<SchemeOfWorkEntity>,
+    onBackClick: () -> Unit,
+    onUpdateDraft: ((SchemeDraftUiState) -> SchemeDraftUiState) -> Unit,
+    onSaveScheme: () -> Unit,
+    onClearStatus: () -> Unit
+) {
+    val context = LocalContext.current
+    var showGuide by remember { mutableStateOf(false) }
+
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(dimensionResource(id = R.dimen.padding_medium)),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        item {
-            Text(
-                text = stringResource(id = R.string.scheme_builder_title),
-                style = MaterialTheme.typography.headlineSmall
+        // --- Header Section ---
+        val headerGradient = Brush.verticalGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
             )
-            Text(
-                text = stringResource(id = R.string.scheme_builder_subtitle),
-                style = MaterialTheme.typography.bodyMedium
-            )
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .background(brush = headerGradient)
+        ) {
+            Column(
+                modifier = Modifier.padding(
+                    start = 12.dp,
+                    end = 20.dp,
+                    top = 16.dp,
+                    bottom = 32.dp
+                )
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Column {
+                        Text(
+                            text = stringResource(id = R.string.scheme_builder_title),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.scheme_builder_subtitle),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
         }
 
-        item {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Guide Toggle ---
             OutlinedButton(
                 onClick = { showGuide = !showGuide },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
             ) {
+                Icon(
+                    imageVector = if (showGuide) Icons.Default.Info else Icons.Default.HelpOutline,
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = if (showGuide) {
                         stringResource(id = R.string.hide_scheme_guide)
@@ -79,212 +188,353 @@ fun SchemeBuilderScreen(
                     }
                 )
             }
-        }
 
-        item {
             AnimatedVisibility(
                 visible = showGuide,
-                enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
-                exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
             ) {
-                Card(modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                    )
+                ) {
                     Column(
-                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_xsmall))
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
                             text = stringResource(id = R.string.scheme_guide_title),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.secondary
                         )
-                        Text(text = stringResource(id = R.string.scheme_guide_step_1))
-                        Text(text = stringResource(id = R.string.scheme_guide_step_2))
-                        Text(text = stringResource(id = R.string.scheme_guide_step_3))
-                        Text(text = stringResource(id = R.string.scheme_guide_step_4))
-                        Text(text = stringResource(id = R.string.scheme_guide_step_5))
+                        val steps = listOf(
+                            R.string.scheme_guide_step_1,
+                            R.string.scheme_guide_step_2,
+                            R.string.scheme_guide_step_3,
+                            R.string.scheme_guide_step_4,
+                            R.string.scheme_guide_step_5
+                        )
+                        steps.forEachIndexed { index, stepRes ->
+                            Row(verticalAlignment = Alignment.Top) {
+                                Text(
+                                    text = "${index + 1}.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.width(24.dp)
+                                )
+                                Text(
+                                    text = stringResource(id = stepRes),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        item {
-            OutlinedTextField(
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Form Section ---
+            SchemeSectionHeader(title = "General Information", icon = Icons.Default.Edit)
+
+            SchemeInputField(
                 value = draft.teacherName,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(teacherName = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.teacher_name_label)) }
+                onValueChange = { value -> onUpdateDraft { it.copy(teacherName = value) } },
+                label = stringResource(id = R.string.teacher_name_label)
             )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.subject,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(subject = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.subject_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.classLevel,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(classLevel = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.class_level_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.term,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(term = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.term_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.week,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(week = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.week_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.topicTitle,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(topicTitle = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.topic_title_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.objectives,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(objectives = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.objectives_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.activities,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(activities = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.activities_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.resources,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(resources = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.resources_label)) }
-            )
-        }
-        item {
-            OutlinedTextField(
-                value = draft.assessment,
-                onValueChange = { value ->
-                    viewModel.updateSchemeDraft { it.copy(assessment = value) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(id = R.string.assessment_label)) }
-            )
-        }
 
-        item {
-            OutlinedButton(
-                onClick = { viewModel.saveSchemeDraft() },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = stringResource(id = R.string.save_scheme_button))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    SchemeInputField(
+                        value = draft.subject,
+                        onValueChange = { value -> onUpdateDraft { it.copy(subject = value) } },
+                        label = stringResource(id = R.string.subject_label)
+                    )
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    SchemeInputField(
+                        value = draft.classLevel,
+                        onValueChange = { value -> onUpdateDraft { it.copy(classLevel = value) } },
+                        label = stringResource(id = R.string.class_level_label)
+                    )
+                }
             }
-        }
 
-        item {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
+                    SchemeInputField(
+                        value = draft.term,
+                        onValueChange = { value -> onUpdateDraft { it.copy(term = value) } },
+                        label = stringResource(id = R.string.term_label)
+                    )
+                }
+                Box(modifier = Modifier.weight(1f)) {
+                    SchemeInputField(
+                        value = draft.week,
+                        onValueChange = { value -> onUpdateDraft { it.copy(week = value) } },
+                        label = stringResource(id = R.string.week_label)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            SchemeSectionHeader(title = "Topic Details", icon = Icons.Default.Add)
+
+            SchemeInputField(
+                value = draft.topicTitle,
+                onValueChange = { value -> onUpdateDraft { it.copy(topicTitle = value) } },
+                label = stringResource(id = R.string.topic_title_label)
+            )
+            SchemeInputField(
+                value = draft.objectives,
+                onValueChange = { value -> onUpdateDraft { it.copy(objectives = value) } },
+                label = stringResource(id = R.string.objectives_label),
+                singleLine = false
+            )
+            SchemeInputField(
+                value = draft.activities,
+                onValueChange = { value -> onUpdateDraft { it.copy(activities = value) } },
+                label = stringResource(id = R.string.activities_label),
+                singleLine = false
+            )
+            SchemeInputField(
+                value = draft.resources,
+                onValueChange = { value -> onUpdateDraft { it.copy(resources = value) } },
+                label = stringResource(id = R.string.resources_label),
+                singleLine = false
+            )
+            SchemeInputField(
+                value = draft.assessment,
+                onValueChange = { value -> onUpdateDraft { it.copy(assessment = value) } },
+                label = stringResource(id = R.string.assessment_label),
+                singleLine = false
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // --- Save Button ---
+            Button(
+                onClick = onSaveScheme,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.save_scheme_button),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             AnimatedVisibility(
                 visible = saveStatus != SchemeSaveStatus.NONE,
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut() + slideOutVertically()
             ) {
-                AssistChip(
-                    onClick = { viewModel.clearSchemeSaveStatus() },
-                    label = {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (saveStatus == SchemeSaveStatus.SUCCESS)
+                            SuccessGreenContainer else WarningOrangeContainer
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = if (saveStatus == SchemeSaveStatus.SUCCESS)
+                                Icons.Default.CheckCircle else Icons.Default.Info,
+                            contentDescription = null,
+                            tint = if (saveStatus == SchemeSaveStatus.SUCCESS)
+                                SuccessGreen else WarningOrange
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = when (saveStatus) {
                                 SchemeSaveStatus.SUCCESS -> stringResource(id = R.string.scheme_saved_message)
                                 SchemeSaveStatus.VALIDATION_ERROR -> stringResource(id = R.string.scheme_validation_message)
                                 SchemeSaveStatus.NONE -> ""
-                            }
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (saveStatus == SchemeSaveStatus.SUCCESS)
+                                SuccessGreen else WarningOrange
                         )
-                    }
-                )
-            }
-        }
-
-        item {
-            Text(
-                text = stringResource(id = R.string.saved_schemes_title),
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-
-        items(schemes, key = { it.id }) { scheme ->
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_xsmall))
-                ) {
-                    Text(
-                        text = stringResource(
-                            id = R.string.scheme_summary_format,
-                            scheme.subject,
-                            scheme.classLevel,
-                            scheme.term,
-                            scheme.week
-                        ),
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                    Text(
-                        text = scheme.topicTitle,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = stringResource(id = R.string.scheme_teacher_format, scheme.teacherName),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    OutlinedButton(
-                        onClick = { shareScheme(context, scheme) },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = stringResource(id = R.string.share_scheme))
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(onClick = onClearStatus) {
+                            Icon(Icons.Default.Add, contentDescription = "Clear", modifier = Modifier.size(16.dp))
+                        }
                     }
                 }
             }
-        }
 
-        item {
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // --- History Section ---
+            if (schemes.isNotEmpty()) {
+                SchemeSectionHeader(title = stringResource(id = R.string.saved_schemes_title), icon = Icons.Default.History)
+
+                schemes.forEach { scheme ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = scheme.topicTitle,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = stringResource(
+                                            id = R.string.scheme_summary_format,
+                                            scheme.subject,
+                                            scheme.classLevel,
+                                            scheme.term,
+                                            scheme.week
+                                        ),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                IconButton(onClick = { shareScheme(context, scheme) }) {
+                                    Icon(
+                                        Icons.Default.Share,
+                                        contentDescription = "Share",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                            
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(id = R.string.scheme_teacher_format, scheme.teacherName),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            
             OutlinedButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.fillMaxWidth()
+                onClick = onBackClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Text(text = stringResource(id = R.string.back))
             }
+            
+            Spacer(modifier = Modifier.height(40.dp))
         }
+    }
+}
+
+@Composable
+fun SchemeSectionHeader(title: String, icon: ImageVector) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(bottom = 12.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
+fun SchemeInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    singleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        label = { Text(text = label) },
+        shape = RoundedCornerShape(16.dp),
+        singleLine = singleLine,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+        )
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SchemeBuilderPreview() {
+    CbcTeachersToolkitTheme {
+        SchemeBuilderContent(
+            draft = SchemeDraftUiState(
+                teacherName = "John Doe",
+                subject = "Mathematics",
+                classLevel = "P.3",
+                term = "Term 1",
+                week = "2",
+                topicTitle = "Addition of 4-digit numbers",
+                objectives = "Pupils should be able to...",
+                activities = "Group work, peer teaching",
+                resources = "Abacus, Chalkboard",
+                assessment = "Mental math test"
+            ),
+            saveStatus = SchemeSaveStatus.NONE,
+            schemes = listOf(
+                SchemeOfWorkEntity(
+                    id = 1,
+                    teacherName = "John Doe",
+                    subject = "Mathematics",
+                    classLevel = "P.3",
+                    term = "Term 1",
+                    week = 1,
+                    topicTitle = "Place Value",
+                    objectives = "...",
+                    activities = "...",
+                    resources = "...",
+                    assessment = "..."
+                )
+            ),
+            onBackClick = {},
+            onUpdateDraft = {},
+            onSaveScheme = {},
+            onClearStatus = {}
+        )
     }
 }

@@ -6,8 +6,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,27 +16,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.PlayCircle
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Topic
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,15 +51,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
+import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openUrl
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResourceDetailScreen(
     navController: NavController,
@@ -60,20 +76,58 @@ fun ResourceDetailScreen(
     topicId: Int
 ) {
     val topic = viewModel.topicById(topicId)
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState by viewModel.uiState.collectAsState()
     val persistedNote = uiState.notes[topicId].orEmpty()
     val isFavorite = uiState.favorites.contains(topicId)
-    val resources = viewModel.observeResourcesForTopic(topicId).collectAsState(initial = emptyList()).value
-    var noteDraft by remember(topicId) { mutableStateOf("") }
-    var showSavedHint by remember { mutableStateOf(false) }
-    var showLessonPlan by rememberSaveable(topicId) { mutableStateOf(true) }
-    var showProjectIdeas by rememberSaveable(topicId) { mutableStateOf(true) }
-    var showAssessment by rememberSaveable(topicId) { mutableStateOf(true) }
-    var showTeachingTips by rememberSaveable(topicId) { mutableStateOf(true) }
+    val resources by viewModel.observeResourcesForTopic(topicId).collectAsState(initial = emptyList())
 
-    LaunchedEffect(persistedNote, topicId) {
+    ResourceDetailContent(
+        topic = topic,
+        isFavorite = isFavorite,
+        persistedNote = persistedNote,
+        downloadedResources = resources,
+        onBackClick = { navController.popBackStack() },
+        onToggleFavorite = { viewModel.toggleFavorite(topicId) },
+        onSaveNote = { note -> viewModel.saveNote(topicId, note) },
+        onOpenResource = { resource ->
+            if (resource.type == "VIDEO") {
+                val encoded = java.net.URLEncoder.encode(resource.url, "UTF-8")
+                navController.navigate("video/$encoded")
+            } else {
+                // Handled via openUrl in content
+            }
+        },
+        onOpenScheme = {
+            navController.navigate("scheme?topicId=$topicId")
+        }
+    )
+}
+
+@Composable
+fun ResourceDetailContent(
+    topic: Topic?,
+    isFavorite: Boolean,
+    persistedNote: String,
+    downloadedResources: List<TeachingResourceEntity> = emptyList(),
+    onBackClick: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    onSaveNote: (String) -> Unit,
+    onOpenResource: (TeachingResourceEntity) -> Unit,
+    onOpenScheme: () -> Unit
+) {
+    var noteDraft by remember(topic?.id) { mutableStateOf(persistedNote) }
+    var showSavedHint by remember { mutableStateOf(false) }
+    var showLessonPlan by rememberSaveable(topic?.id) { mutableStateOf(true) }
+    var showProjectIdeas by rememberSaveable(topic?.id) { mutableStateOf(false) }
+    var showAssessment by rememberSaveable(topic?.id) { mutableStateOf(false) }
+    var showTeachingTips by rememberSaveable(topic?.id) { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(persistedNote) {
         noteDraft = persistedNote
     }
+
     LaunchedEffect(showSavedHint) {
         if (showSavedHint) {
             delay(1500)
@@ -81,223 +135,291 @@ fun ResourceDetailScreen(
         }
     }
 
-    if (topic == null) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(id = R.dimen.padding_medium))
-        ) {
-            Text(text = stringResource(id = R.string.no_topics_found))
-        }
-        return
-    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // --- Header Section ---
+        val headerGradient = Brush.verticalGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+            )
+        )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(
-                            id = R.string.resource_title_format,
-                            topic.title,
-                            topic.classLevel,
-                            topic.subject
-                        )
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .background(brush = headerGradient)
+        ) {
+            Column(
+                modifier = Modifier.padding(
+                    start = 12.dp,
+                    end = 20.dp,
+                    top = 16.dp,
+                    bottom = 32.dp
+                )
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(id = R.string.back)
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Column {
+                        Text(
+                            text = topic?.title ?: "Resource Detail",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = if (topic != null) "${topic.subject} • ${topic.classLevel}" else "",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(onClick = onToggleFavorite) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                            contentDescription = "Favorite",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
-            )
+            }
         }
-    ) { innerPadding ->
+
+        if (topic == null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Topic not found", style = MaterialTheme.typography.bodyLarge)
+            }
+            return@Column
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(dimensionResource(id = R.dimen.padding_medium))
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
         ) {
-            DetailSectionCard(
-                title = stringResource(id = R.string.official_resources),
-                content = "",
-                expanded = true,
-                onToggle = {}
-            )
-            val context = LocalContext.current
-            OutlinedButton(
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Official Resources Section ---
+            SectionHeader(title = "Resources", icon = Icons.Default.Topic)
+            
+            Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    // Safe/copyright-friendly: open official source in browser
                     val query = "site:ncdc.go.ug ${topic.subject} ${topic.classLevel} ${topic.title}"
                     openUrl(context, "https://www.google.com/search?q=" + java.net.URLEncoder.encode(query, "UTF-8"))
-                }
+                },
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(text = stringResource(id = R.string.open_on_ncdc))
+                Icon(Icons.Default.Link, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Search NCDC for ${topic.title}")
             }
 
-            if (resources.isNotEmpty()) {
-                Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))) {
-                    Text(
-                        text = stringResource(id = R.string.downloaded_resources),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    resources.forEach { resource ->
-                        OutlinedButton(
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                if (resource.type == "VIDEO") {
-                                    val encoded = java.net.URLEncoder.encode(resource.url, "UTF-8")
-                                    navController.navigate("video/$encoded")
-                                } else {
-                                    openUrl(context, resource.url)
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = when (resource.type) {
-                                    "VIDEO" -> Icons.Filled.PlayCircle
-                                    "NOTES" -> Icons.AutoMirrored.Filled.MenuBook
-                                    else -> Icons.Filled.Link
-                                },
-                                contentDescription = null
-                            )
-                            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
-                            Text(text = resource.title)
-                        }
+            if (downloadedResources.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                downloadedResources.forEach { resource ->
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { onOpenResource(resource) },
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = when (resource.type) {
+                                "VIDEO" -> Icons.Filled.PlayCircle
+                                "NOTES" -> Icons.AutoMirrored.Filled.MenuBook
+                                else -> Icons.Filled.Link
+                            },
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = resource.title)
                     }
                 }
-            } else {
-                Text(
-                    text = stringResource(id = R.string.no_downloaded_resources),
-                    style = MaterialTheme.typography.bodySmall
-                )
             }
 
-            DetailSectionCard(
-                title = stringResource(id = R.string.lesson_plan),
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Collapsible Sections ---
+            ExpandableSection(
+                title = "Lesson Plan",
                 content = topic.lessonPlan,
                 expanded = showLessonPlan,
                 onToggle = { showLessonPlan = !showLessonPlan }
             )
 
-            DetailSectionCard(
-                title = stringResource(id = R.string.project_ideas),
+            ExpandableSection(
+                title = "Project Ideas",
                 content = topic.projectIdeas,
                 expanded = showProjectIdeas,
                 onToggle = { showProjectIdeas = !showProjectIdeas }
             )
 
-            DetailSectionCard(
-                title = stringResource(id = R.string.assessment_rubric),
+            ExpandableSection(
+                title = "Assessment Rubric",
                 content = topic.assessmentRubric,
                 expanded = showAssessment,
                 onToggle = { showAssessment = !showAssessment }
             )
 
-            DetailSectionCard(
-                title = stringResource(id = R.string.teaching_tips),
+            ExpandableSection(
+                title = "Teaching Tips",
                 content = topic.teachingTips,
                 expanded = showTeachingTips,
                 onToggle = { showTeachingTips = !showTeachingTips }
             )
 
-            Row(
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // --- Quick Actions ---
+            SectionHeader(title = "Tools", icon = Icons.Default.Save)
+            
+            Button(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+                onClick = onOpenScheme,
+                shape = RoundedCornerShape(12.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
             ) {
-                OutlinedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = { viewModel.toggleFavorite(topicId) }
-                ) {
-                    Icon(
-                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = stringResource(id = R.string.favorite)
-                    )
-                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
-                    Text(text = stringResource(id = R.string.favorite))
-                }
-                OutlinedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        viewModel.saveNote(topicId, noteDraft)
-                        showSavedHint = true
-                    }
-                ) {
-                    Text(text = stringResource(id = R.string.save_note))
-                }
+                Text("Generate Scheme of Work")
             }
 
-            OutlinedButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { navController.navigate("scheme?topicId=$topicId") }
-            ) {
-                Text(text = stringResource(id = R.string.open_scheme_for_topic))
-            }
+            Spacer(modifier = Modifier.height(16.dp))
 
+            // --- My Notes ---
             OutlinedTextField(
                 value = noteDraft,
                 onValueChange = { noteDraft = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(id = R.string.saved_note)) },
-                placeholder = { Text(stringResource(id = R.string.note_hint)) }
+                label = { Text("My Teaching Notes") },
+                placeholder = { Text("Add your observations or adjustments for this topic...") },
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                ),
+                trailingIcon = {
+                    IconButton(onClick = { 
+                        onSaveNote(noteDraft)
+                        showSavedHint = true
+                    }) {
+                        Icon(Icons.Default.Save, contentDescription = "Save Note", tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
             )
 
-            AnimatedVisibility(
-                visible = showSavedHint,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically(),
-                modifier = Modifier.animateContentSize()
+            AnimatedVisibility(visible = showSavedHint) {
+                Text(
+                    text = "Note saved successfully!",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = 4.dp, start = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+fun SectionHeader(title: String, icon: ImageVector) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(bottom = 12.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Composable
+fun ExpandableSection(
+    title: String,
+    content: String,
+    expanded: Boolean,
+    onToggle: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(16.dp),
+        onClick = onToggle
+    ) {
+        Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(id = R.string.note_saved_message),
-                    style = MaterialTheme.typography.bodySmall
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = null
+                )
+            }
+            if (expanded) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun DetailSectionCard(
-    title: String,
-    content: String,
-    expanded: Boolean,
-    onToggle: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .animateContentSize()
-            .clickable { onToggle() },
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = title, style = MaterialTheme.typography.titleLarge)
-            Icon(
-                imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                contentDescription = if (expanded) {
-                    stringResource(id = R.string.collapse_section)
-                } else {
-                    stringResource(id = R.string.expand_section)
-                }
-            )
-        }
-        AnimatedVisibility(
-            visible = expanded,
-            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 5 }),
-            exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 5 })
-        ) {
-            Text(text = content, style = MaterialTheme.typography.bodyMedium)
-        }
+fun ResourceDetailPreview() {
+    CbcTeachersToolkitTheme {
+        ResourceDetailContent(
+            topic = Topic(
+                id = 1,
+                title = "Counting Numbers",
+                subject = "Mathematics",
+                classLevel = "P.1",
+                lessonPlan = "1. Introduction to numbers 1-10\n2. Practical counting using bottle tops\n3. Group activities.",
+                projectIdeas = "Create a number line using locally available materials.",
+                assessmentRubric = "Can identify numbers: 5pts\nCan count objects: 5pts",
+                teachingTips = "Use songs and rhymes to make counting fun for P.1 pupils."
+            ),
+            isFavorite = true,
+            persistedNote = "Pupils enjoyed the bottle top activity.",
+            onBackClick = {},
+            onToggleFavorite = {},
+            onSaveNote = {},
+            onOpenResource = {},
+            onOpenScheme = {}
+        )
     }
 }

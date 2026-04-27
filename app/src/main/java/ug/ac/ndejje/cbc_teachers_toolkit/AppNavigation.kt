@@ -43,6 +43,7 @@ fun AppNavigation() {
             HomeScreen(
                 navController = navController,
                 viewModel = viewModel,
+                teacherName = currentUser?.fullName ?: "Teacher",
                 onLogout = {
                     authViewModel.logout()
                     navController.navigate("login") {
@@ -60,7 +61,7 @@ fun AppNavigation() {
             arguments = listOf(navArgument("encodedUrl") { type = NavType.StringType })
         ) { backStackEntry ->
             val encodedUrl = backStackEntry.arguments?.getString("encodedUrl").orEmpty()
-            VideoPlayerScreen(encodedUrl = encodedUrl)
+            VideoPlayerScreen(navController = navController, encodedUrl = encodedUrl)
         }
         composable(
             route = "scheme?topicId={topicId}",
