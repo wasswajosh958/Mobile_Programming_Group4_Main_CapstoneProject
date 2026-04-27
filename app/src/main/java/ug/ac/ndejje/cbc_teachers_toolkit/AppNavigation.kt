@@ -28,6 +28,18 @@ fun AppNavigation() {
         composable("about") { AboutScreen(navController) }
         composable("updates") { UpdatesScreen(navController, viewModel) }
         composable(
+            route = "scheme?topicId={topicId}",
+            arguments = listOf(
+                navArgument("topicId") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ) { backStackEntry ->
+            val topicId = backStackEntry.arguments?.getInt("topicId") ?: -1
+            SchemeBuilderScreen(navController, viewModel, topicId)
+        }
+        composable(
             route = "resource/{topicId}",
             arguments = listOf(navArgument("topicId") { type = NavType.IntType })
         ) { backStackEntry ->

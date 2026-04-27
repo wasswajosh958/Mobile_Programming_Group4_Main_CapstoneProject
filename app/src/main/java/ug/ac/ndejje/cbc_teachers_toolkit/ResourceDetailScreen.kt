@@ -222,6 +222,13 @@ fun ResourceDetailScreen(
                 }
             }
 
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { navController.navigate("scheme?topicId=$topicId") }
+            ) {
+                Text(text = stringResource(id = R.string.open_scheme_for_topic))
+            }
+
             OutlinedTextField(
                 value = noteDraft,
                 onValueChange = { noteDraft = it },

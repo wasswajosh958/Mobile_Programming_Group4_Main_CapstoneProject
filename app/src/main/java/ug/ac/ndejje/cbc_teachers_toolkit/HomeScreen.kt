@@ -102,6 +102,12 @@ fun HomeScreen(
         ) {
             Text(text = stringResource(id = R.string.open_updates))
         }
+        TextButton(
+            onClick = { navController.navigate("scheme") },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = stringResource(id = R.string.open_scheme_builder))
+        }
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
