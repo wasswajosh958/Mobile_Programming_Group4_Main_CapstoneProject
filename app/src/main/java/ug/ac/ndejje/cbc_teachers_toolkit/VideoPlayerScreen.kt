@@ -40,7 +40,9 @@ fun VideoPlayerScreen(
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
                     settings.loadsImagesAutomatically = true
-                    settings.cacheMode = WebSettings.LOAD_DEFAULT
+                    // Best-effort offline re-open:
+                    // If the page/video was loaded online once, WebView may reuse cached data later.
+                    settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
                     loadUrl(decodedUrl)
                 }
             },

@@ -122,9 +122,15 @@ class TopicRepository(
 
     private suspend fun buildOfflineStarterResources(): List<TeachingResourceEntity> {
         return topicDao.getTopics().flatMap { topic ->
-            val videoQuery =
-                "https://www.youtube.com/results?search_query=" +
-                    java.net.URLEncoder.encode("${topic.subject} ${topic.classLevel} ${topic.title} lesson", "UTF-8")
+            val q1 = "${topic.subject} ${topic.classLevel} ${topic.title} lesson"
+            val q2 = "${topic.title} ${topic.classLevel} ${topic.subject} tutorial"
+            val q3 = "${topic.subject} ${topic.title} CBC Uganda"
+            val video1 =
+                "https://www.youtube.com/results?search_query=" + java.net.URLEncoder.encode(q1, "UTF-8")
+            val video2 =
+                "https://www.youtube.com/results?search_query=" + java.net.URLEncoder.encode(q2, "UTF-8")
+            val video3 =
+                "https://www.youtube.com/results?search_query=" + java.net.URLEncoder.encode(q3, "UTF-8")
             val notesQuery =
                 "https://www.google.com/search?q=" +
                     java.net.URLEncoder.encode(
@@ -139,11 +145,27 @@ class TopicRepository(
                     )
             listOf(
                 TeachingResourceEntity(
-                    key = "${topic.id}|VIDEO|$videoQuery",
+                    key = "${topic.id}|VIDEO|$video1",
                     topicId = topic.id,
-                    title = "Video tutorial: ${topic.title}",
+                    title = "Video (lesson): ${topic.title}",
                     type = "VIDEO",
-                    url = videoQuery,
+                    url = video1,
+                    source = "WEB"
+                ),
+                TeachingResourceEntity(
+                    key = "${topic.id}|VIDEO|$video2",
+                    topicId = topic.id,
+                    title = "Video (tutorial): ${topic.title}",
+                    type = "VIDEO",
+                    url = video2,
+                    source = "WEB"
+                ),
+                TeachingResourceEntity(
+                    key = "${topic.id}|VIDEO|$video3",
+                    topicId = topic.id,
+                    title = "Video (CBC context): ${topic.title}",
+                    type = "VIDEO",
+                    url = video3,
                     source = "WEB"
                 ),
                 TeachingResourceEntity(
