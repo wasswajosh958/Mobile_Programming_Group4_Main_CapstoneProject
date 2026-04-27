@@ -13,13 +13,18 @@ object ResourceIndexParser {
         val items = buildList {
             for (i in 0 until itemsJson.length()) {
                 val item = itemsJson.getJSONObject(i)
+                val sourceValue = if (item.has("source") && !item.isNull("source")) {
+                    item.getString("source")
+                } else {
+                    null
+                }
                 add(
                     ResourceIndexItem(
                         topicId = item.getInt("topicId"),
                         title = item.getString("title"),
                         type = item.getString("type"),
                         url = item.getString("url"),
-                        source = item.optString("source", null)
+                        source = sourceValue
                     )
                 )
             }

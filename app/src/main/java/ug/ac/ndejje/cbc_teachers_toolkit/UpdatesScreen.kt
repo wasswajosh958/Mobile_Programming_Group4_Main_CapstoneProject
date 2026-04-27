@@ -16,7 +16,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 
 @Composable
 fun UpdatesScreen(
@@ -24,7 +26,19 @@ fun UpdatesScreen(
     viewModel: SubjectViewModel
 ) {
     val updates by viewModel.updatesState.collectAsState()
+    UpdatesScreenContent(
+        updates = updates,
+        onUpdateNow = { viewModel.updateResourcesNow() },
+        onBack = { navController.popBackStack() }
+    )
+}
 
+@Composable
+private fun UpdatesScreenContent(
+    updates: UpdatesUiState,
+    onUpdateNow: () -> Unit,
+    onBack: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,7 +77,7 @@ fun UpdatesScreen(
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
         OutlinedButton(
-            onClick = { viewModel.updateResourcesNow() },
+            onClick = onUpdateNow,
             modifier = Modifier.fillMaxWidth(),
             enabled = !updates.isUpdating
         ) {
@@ -71,10 +85,26 @@ fun UpdatesScreen(
         }
 
         OutlinedButton(
-            onClick = { navController.popBackStack() },
+            onClick = onBack,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(id = R.string.back))
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun UpdatesScreenPreview() {
+    CbcTeachersToolkitTheme {
+        UpdatesScreenContent(
+            updates = UpdatesUiState(
+                isUpdating = false,
+                status = UpdateStatus.UPDATED,
+                downloadedCount = 96
+            ),
+            onUpdateNow = {},
+            onBack = {}
+        )
     }
 }

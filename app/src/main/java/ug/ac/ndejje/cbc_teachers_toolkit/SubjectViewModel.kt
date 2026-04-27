@@ -67,20 +67,27 @@ class SubjectViewModel(
     private val selectedSubject = MutableStateFlow<String?>(null)
     private val selectedClassLevel = MutableStateFlow<String?>(null)
     private val searchQuery = MutableStateFlow("")
-    val uiState: StateFlow<SubjectsUiState> = combine(
-        repository.observeTopics(),
+    private val filtersFlow = combine(
         selectedSubject,
         selectedClassLevel,
-        searchQuery,
+        searchQuery
+    ) { subject, classLevel, query ->
+        Triple(subject, classLevel, query)
+    }
+    private val teacherDataFlow = combine(
         repository.observeFavoriteIds(),
         repository.observeNotes()
-    ) { flowArray ->
-        val topics = flowArray[0] as List<Topic>
-        val subject = flowArray[1] as String?
-        val classLevel = flowArray[2] as String?
-        val query = flowArray[3] as String
-        val favoriteIds = flowArray[4] as Set<Int>
-        val noteMap = flowArray[5] as Map<Int, String>
+    ) { favoriteIds, noteMap ->
+        favoriteIds to noteMap
+    }
+
+    val uiState: StateFlow<SubjectsUiState> = combine(
+        repository.observeTopics(),
+        filtersFlow,
+        teacherDataFlow
+    ) { topics, filters, teacherData ->
+        val (subject, classLevel, query) = filters
+        val (favoriteIds, noteMap) = teacherData
         val normalizedQuery = query.trim().lowercase()
         val filtered = topics.filter { topic ->
             val subjectMatches = subject.isNullOrBlank() || topic.subject == subject
