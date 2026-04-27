@@ -59,6 +59,11 @@
     <string name="updates_subtitle">Download latest resource links when online, then use them offline.</string>
     <string name="update_resources_button">Update Resources Now</string>
     <string name="updates_status_format">Status: %1$s</string>
+    <string name="update_status_idle">Idle</string>
+    <string name="update_status_updating">Updating</string>
+    <string name="update_status_updated">Updated</string>
+    <string name="update_status_failed">Failed</string>
+    <string name="updated_resources_count">Downloaded %1$d resources for offline use.</string>
     <string name="open_scheme_builder">Scheme Builder</string>
     <string name="open_scheme_for_topic">Create Scheme From This Topic</string>
     <string name="scheme_builder_title">Scheme of Work Builder</string>
@@ -87,4 +92,5 @@
     <string name="scheme_validation_message">Please fill all scheme fields before saving.</string>
     <string name="scheme_summary_format">%1$s - %2$s | %3$s Week %4$d</string>
     <string name="scheme_teacher_format">Teacher: %1$s</string>
+    <string name="share_scheme">Share Scheme</string>
 </resources>

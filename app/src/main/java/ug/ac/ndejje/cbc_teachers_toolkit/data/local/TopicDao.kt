@@ -12,6 +12,9 @@ interface TopicDao {
     @Query("SELECT * FROM topics ORDER BY subject, classLevel, title")
     fun observeTopics(): Flow<List<TopicEntity>>
 
+    @Query("SELECT * FROM topics ORDER BY id")
+    suspend fun getTopics(): List<TopicEntity>
+
     @Query("SELECT * FROM topics WHERE id = :id LIMIT 1")
     fun observeTopicById(id: Int): Flow<TopicEntity?>
 

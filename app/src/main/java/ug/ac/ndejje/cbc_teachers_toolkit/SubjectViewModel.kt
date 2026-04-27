@@ -29,8 +29,9 @@ data class SubjectsUiState(
 
 data class UpdatesUiState(
     val isUpdating: Boolean = false,
-    val status: String = "Idle",
-    val message: String = ""
+    val status: UpdateStatus = UpdateStatus.IDLE,
+    val downloadedCount: Int = 0,
+    val errorMessage: String = ""
 )
 
 data class SchemeDraftUiState(
@@ -50,6 +51,13 @@ enum class SchemeSaveStatus {
     NONE,
     VALIDATION_ERROR,
     SUCCESS
+}
+
+enum class UpdateStatus {
+    IDLE,
+    UPDATING,
+    UPDATED,
+    FAILED
 }
 
 class SubjectViewModel(
@@ -128,19 +136,19 @@ class SubjectViewModel(
 
     fun updateResourcesNow() {
         viewModelScope.launch {
-            _updatesState.value = UpdatesUiState(isUpdating = true, status = "Updating", message = "")
+            _updatesState.value = UpdatesUiState(isUpdating = true, status = UpdateStatus.UPDATING)
             try {
                 val count = repository.syncResourcesFromIndexUrl(resourceIndexUrl)
                 _updatesState.value = UpdatesUiState(
                     isUpdating = false,
-                    status = "Updated",
-                    message = "Downloaded $count resources for offline use."
+                    status = UpdateStatus.UPDATED,
+                    downloadedCount = count
                 )
             } catch (e: Exception) {
                 _updatesState.value = UpdatesUiState(
                     isUpdating = false,
-                    status = "Failed",
-                    message = e.message ?: "Update failed"
+                    status = UpdateStatus.FAILED,
+                    errorMessage = e.message ?: "Update failed"
                 )
             }
         }

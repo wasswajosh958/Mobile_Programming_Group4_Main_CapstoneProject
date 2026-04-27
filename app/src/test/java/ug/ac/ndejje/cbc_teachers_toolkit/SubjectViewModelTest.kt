@@ -107,6 +107,8 @@ private class FakeTopicDao : TopicDao {
 
     override fun observeTopics(): Flow<List<TopicEntity>> = state
 
+    override suspend fun getTopics(): List<TopicEntity> = state.value
+
     override fun observeTopicById(id: Int): Flow<TopicEntity?> {
         return MutableStateFlow(state.value.firstOrNull { it.id == id })
     }

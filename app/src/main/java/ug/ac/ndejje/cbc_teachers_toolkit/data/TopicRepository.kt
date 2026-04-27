@@ -63,7 +63,7 @@ class TopicRepository(
                 url = item.url,
                 source = item.source ?: "NCDC"
             )
-        }
+        } + buildGeneratedCompanionResources()
 
         topicDao.insertResources(entities)
         return entities.size
@@ -82,6 +82,38 @@ class TopicRepository(
             topicDao.deleteNote(topicId)
         } else {
             topicDao.upsertNote(NoteEntity(topicId, note.trim()))
+        }
+    }
+
+    private suspend fun buildGeneratedCompanionResources(): List<TeachingResourceEntity> {
+        return topicDao.getTopics().flatMap { topic ->
+            val videoQuery =
+                "https://www.youtube.com/results?search_query=" +
+                    java.net.URLEncoder.encode("${topic.subject} ${topic.classLevel} ${topic.title} lesson", "UTF-8")
+            val notesQuery =
+                "https://www.google.com/search?q=" +
+                    java.net.URLEncoder.encode(
+                        "site:ncdc.go.ug ${topic.subject} ${topic.classLevel} ${topic.title} notes",
+                        "UTF-8"
+                    )
+            listOf(
+                TeachingResourceEntity(
+                    key = "${topic.id}|VIDEO|$videoQuery",
+                    topicId = topic.id,
+                    title = "Video lessons: ${topic.title}",
+                    type = "VIDEO",
+                    url = videoQuery,
+                    source = "WEB"
+                ),
+                TeachingResourceEntity(
+                    key = "${topic.id}|NOTES|$notesQuery",
+                    topicId = topic.id,
+                    title = "Teaching notes: ${topic.title}",
+                    type = "NOTES",
+                    url = notesQuery,
+                    source = "NCDC/WEB"
+                )
+            )
         }
     }
 }

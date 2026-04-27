@@ -36,12 +36,28 @@ fun UpdatesScreen(
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
 
+        val statusText = when (updates.status) {
+            UpdateStatus.IDLE -> stringResource(id = R.string.update_status_idle)
+            UpdateStatus.UPDATING -> stringResource(id = R.string.update_status_updating)
+            UpdateStatus.UPDATED -> stringResource(id = R.string.update_status_updated)
+            UpdateStatus.FAILED -> stringResource(id = R.string.update_status_failed)
+        }
         Text(
-            text = stringResource(id = R.string.updates_status_format, updates.status),
+            text = stringResource(id = R.string.updates_status_format, statusText),
             style = MaterialTheme.typography.bodyMedium
         )
-        if (updates.message.isNotBlank()) {
-            Text(text = updates.message, style = MaterialTheme.typography.bodySmall)
+        if (updates.downloadedCount > 0) {
+            Text(
+                text = stringResource(id = R.string.updated_resources_count, updates.downloadedCount),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+        if (updates.errorMessage.isNotBlank()) {
+            Text(
+                text = updates.errorMessage,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error
+            )
         }
 
         Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
