@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ug.ac.ndejje.cbc_teachers_toolkit.data.TopicRepository
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.SchemeOfWorkEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 
@@ -32,6 +33,25 @@ data class UpdatesUiState(
     val message: String = ""
 )
 
+data class SchemeDraftUiState(
+    val teacherName: String = "",
+    val subject: String = "",
+    val classLevel: String = "",
+    val term: String = "",
+    val week: String = "",
+    val topicTitle: String = "",
+    val objectives: String = "",
+    val activities: String = "",
+    val resources: String = "",
+    val assessment: String = ""
+)
+
+enum class SchemeSaveStatus {
+    NONE,
+    VALIDATION_ERROR,
+    SUCCESS
+}
+
 class SubjectViewModel(
     private val repository: TopicRepository
 ) : ViewModel() {
@@ -53,7 +73,6 @@ class SubjectViewModel(
         val query = flowArray[3] as String
         val favoriteIds = flowArray[4] as Set<Int>
         val noteMap = flowArray[5] as Map<Int, String>
-
         val normalizedQuery = query.trim().lowercase()
         val filtered = topics.filter { topic ->
             val subjectMatches = subject.isNullOrBlank() || topic.subject == subject
@@ -92,6 +111,16 @@ class SubjectViewModel(
 
     private val _updatesState = MutableStateFlow(UpdatesUiState())
     val updatesState: StateFlow<UpdatesUiState> = _updatesState
+    private val _schemeDraftState = MutableStateFlow(SchemeDraftUiState())
+    val schemeDraftState: StateFlow<SchemeDraftUiState> = _schemeDraftState
+    private val _schemeSaveStatus = MutableStateFlow(SchemeSaveStatus.NONE)
+    val schemeSaveStatus: StateFlow<SchemeSaveStatus> = _schemeSaveStatus
+
+    val schemes = repository.observeSchemes().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+        initialValue = emptyList()
+    )
 
     // Hosted JSON index (safe: metadata + links only). You can replace this later with your own hosting.
     private val resourceIndexUrl =
@@ -146,6 +175,66 @@ class SubjectViewModel(
     }
 
     fun observeResourcesForTopic(topicId: Int) = repository.observeResourcesForTopic(topicId)
+
+    fun updateSchemeDraft(update: (SchemeDraftUiState) -> SchemeDraftUiState) {
+        _schemeDraftState.value = update(_schemeDraftState.value)
+    }
+
+    fun prefillSchemeFromTopic(topicId: Int) {
+        val topic = topicById(topicId) ?: return
+        val current = _schemeDraftState.value
+        if (current.subject.isBlank() && current.classLevel.isBlank() && current.topicTitle.isBlank()) {
+            _schemeDraftState.value = current.copy(
+                subject = topic.subject,
+                classLevel = topic.classLevel,
+                topicTitle = topic.title
+            )
+        }
+    }
+
+    fun saveSchemeDraft() {
+        val draft = _schemeDraftState.value
+        val weekValue = draft.week.toIntOrNull()
+        if (draft.teacherName.isBlank() ||
+            draft.subject.isBlank() ||
+            draft.classLevel.isBlank() ||
+            draft.term.isBlank() ||
+            weekValue == null ||
+            draft.topicTitle.isBlank() ||
+            draft.objectives.isBlank() ||
+            draft.activities.isBlank() ||
+            draft.resources.isBlank() ||
+            draft.assessment.isBlank()
+        ) {
+            _schemeSaveStatus.value = SchemeSaveStatus.VALIDATION_ERROR
+            return
+        }
+
+        viewModelScope.launch {
+            repository.insertScheme(
+                SchemeOfWorkEntity(
+                    teacherName = draft.teacherName.trim(),
+                    subject = draft.subject.trim(),
+                    classLevel = draft.classLevel.trim(),
+                    term = draft.term.trim(),
+                    week = weekValue,
+                    topicTitle = draft.topicTitle.trim(),
+                    objectives = draft.objectives.trim(),
+                    activities = draft.activities.trim(),
+                    resources = draft.resources.trim(),
+                    assessment = draft.assessment.trim()
+                )
+            )
+            _schemeSaveStatus.value = SchemeSaveStatus.SUCCESS
+            _schemeDraftState.value = SchemeDraftUiState(
+                teacherName = draft.teacherName
+            )
+        }
+    }
+
+    fun clearSchemeSaveStatus() {
+        _schemeSaveStatus.value = SchemeSaveStatus.NONE
+    }
 
     class Factory(
         private val repository: TopicRepository
