@@ -1,6 +1,7 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
@@ -15,6 +16,16 @@ fun AppNavigation() {
     val viewModel = appViewModel()
     val authViewModel = authViewModel()
     val currentUser by authViewModel.currentUser.collectAsState()
+
+    LaunchedEffect(currentUser) {
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
+        if (currentUser != null && currentRoute == "login") {
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
 
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {

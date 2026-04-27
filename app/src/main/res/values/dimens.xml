@@ -7,4 +7,5 @@
     <dimen name="card_elevation">4dp</dimen>
     <dimen name="search_bar_corner">16dp</dimen>
     <dimen name="scheme_list_height">220dp</dimen>
+    <dimen name="login_logo_size">56dp</dimen>
 </resources>

@@ -103,5 +103,9 @@
     <string name="switch_to_register">Need an account? Register</string>
     <string name="switch_to_login">Already have an account? Login</string>
     <string name="default_login_hint">Demo account: username teacher, password 1234</string>
+    <string name="register_hint">Create your offline account and continue to the app.</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
+    <string name="login_logo_short">CBC</string>
     <string name="logout_button">Logout</string>
 </resources>
