@@ -4,6 +4,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -29,14 +32,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.media3.common.MediaItem
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
+import java.io.File
 
+@OptIn(UnstableApi::class)
 @Composable
 fun VideoPlayerScreen(
     navController: NavController,
     encodedUrl: String
 ) {
     val decodedUrl = java.net.URLDecoder.decode(encodedUrl, "UTF-8")
+    val context = LocalContext.current
+    val isYouTube = decodedUrl.contains("youtube.com") || decodedUrl.contains("youtu.be")
+    
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            val mediaItem = if (decodedUrl.startsWith("/")) {
+                MediaItem.fromUri(android.net.Uri.fromFile(File(decodedUrl)))
+            } else {
+                MediaItem.fromUri(decodedUrl)
+            }
+            setMediaItem(mediaItem)
+            prepare()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -65,7 +94,7 @@ fun VideoPlayerScreen(
                     bottom = 32.dp
                 )
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -84,25 +113,45 @@ fun VideoPlayerScreen(
             }
         }
 
-        AndroidView(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            factory = { context ->
-                WebView(context).apply {
-                    webViewClient = WebViewClient()
-                    webChromeClient = WebChromeClient()
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    settings.loadsImagesAutomatically = true
-                    settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-                    loadUrl(decodedUrl)
-                }
-            },
-            update = { webView ->
-                webView.loadUrl(decodedUrl)
+                .clip(RoundedCornerShape(16.dp))
+                .background(androidx.compose.ui.graphics.Color.Black),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            if (isYouTube) {
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = { ctx ->
+                        WebView(ctx).apply {
+                            webViewClient = WebViewClient()
+                            webChromeClient = WebChromeClient()
+                            settings.javaScriptEnabled = true
+                            settings.domStorageEnabled = true
+                            settings.loadsImagesAutomatically = true
+                            settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+                            loadUrl(decodedUrl)
+                        }
+                    },
+                    update = { webView ->
+                        webView.loadUrl(decodedUrl)
+                    }
+                )
+            } else {
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = { ctx ->
+                        PlayerView(ctx).apply {
+                            player = exoPlayer
+                            useController = true
+                            setShowNextButton(false)
+                            setShowPreviousButton(false)
+                        }
+                    }
+                )
             }
-        )
+        }
     }
 }

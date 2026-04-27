@@ -1,5 +1,6 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,12 +35,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import ug.ac.ndejje.cbc_teachers_toolkit.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.compose.material.icons.filled.DownloadDone
+import androidx.compose.material.icons.filled.PlayCircle
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openDownloadedFile
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openNotesAsPdf
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material3.OutlinedButton
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openUrl
 
 @Composable
 fun LibraryScreen(
@@ -46,15 +57,37 @@ fun LibraryScreen(
     viewModel: SubjectViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val downloadedResources by viewModel.downloadedResources.collectAsState()
     val favoriteTopics = uiState.allTopics.filter { uiState.favorites.contains(it.id) }
     val notedTopics = uiState.allTopics.filter { uiState.notes[it.id].isNullOrBlank().not() }
 
     LibraryContent(
         favoriteTopics = favoriteTopics,
         notedTopics = notedTopics,
+        downloadedResources = downloadedResources,
         notes = uiState.notes,
         onBackClick = { navController.popBackStack() },
-        onTopicClick = { topicId -> navController.navigate("resource/$topicId") }
+        onTopicClick = { topicId -> navController.navigate("resource/$topicId") },
+        onResourceClick = { resource ->
+            if (resource.type == "VIDEO") {
+                val pathOrUrl = if (resource.isDownloaded && resource.localPath?.isNotBlank() == true) {
+                    resource.localPath
+                } else {
+                    resource.url
+                }
+                val encoded = java.net.URLEncoder.encode(pathOrUrl, "UTF-8")
+                navController.navigate("video/$encoded")
+            } else {
+                if (resource.isDownloaded && resource.localPath?.isNotBlank() == true) {
+                    openDownloadedFile(navController.context, resource.localPath)
+                } else {
+                    openUrl(navController.context, resource.url)
+                }
+            }
+        },
+        onViewNote = { topic, note ->
+            openNotesAsPdf(navController.context, topic, note)
+        }
     )
 }
 
@@ -62,9 +95,12 @@ fun LibraryScreen(
 fun LibraryContent(
     favoriteTopics: List<Topic>,
     notedTopics: List<Topic>,
+    downloadedResources: List<TeachingResourceEntity> = emptyList(),
     notes: Map<Int, String>,
     onBackClick: () -> Unit,
-    onTopicClick: (Int) -> Unit
+    onTopicClick: (Int) -> Unit,
+    onResourceClick: (TeachingResourceEntity) -> Unit = {},
+    onViewNote: (Topic, String) -> Unit = { _, _ -> }
 ) {
     Column(
         modifier = Modifier
@@ -119,7 +155,7 @@ fun LibraryContent(
             }
         }
 
-        if (favoriteTopics.isEmpty() && notedTopics.isEmpty()) {
+        if (favoriteTopics.isEmpty() && notedTopics.isEmpty() && downloadedResources.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -127,11 +163,26 @@ fun LibraryContent(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(id = R.string.library_empty),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
+                Spacer(modifier = Modifier.height(24.dp))
+                OutlinedButton(
+                    onClick = onBackClick,
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text(text = "Go to Topics")
+                }
             }
         } else {
             LazyColumn(
@@ -141,6 +192,50 @@ fun LibraryContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item { Spacer(modifier = Modifier.height(16.dp)) }
+
+                if (downloadedResources.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "Offline Resources",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    items(downloadedResources) { resource ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                            onClick = { onResourceClick(resource) }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = if (resource.type == "VIDEO") Icons.Default.PlayCircle else Icons.Default.DownloadDone,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = resource.title,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                    )
+                                    Text(
+                                        text = "Available Offline",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
 
                 if (favoriteTopics.isNotEmpty()) {
                     item {
@@ -158,6 +253,10 @@ fun LibraryContent(
                                 shape = RoundedCornerShape(16.dp),
                                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                ),
                                 onClick = { onTopicClick(topic.id) }
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
@@ -193,19 +292,37 @@ fun LibraryContent(
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            ),
                             onClick = { onTopicClick(topic.id) }
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(
-                                    text = topic.title,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Text(
-                                    text = notes[topic.id].orEmpty(),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = topic.title,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = notes[topic.id].orEmpty(),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 2,
+                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                    )
+                                }
+                                IconButton(onClick = { onViewNote(topic, notes[topic.id].orEmpty()) }) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                                        contentDescription = "View as PDF",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             }
                         }
                     }

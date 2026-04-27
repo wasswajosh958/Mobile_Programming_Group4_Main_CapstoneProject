@@ -10,5 +10,8 @@ data class TeachingResourceEntity(
     val title: String,
     val type: String, // "NCDC_WEB", "VIDEO", "PDF_LINK", "OTHER"
     val url: String,
-    val source: String = "NCDC"
+    val source: String = "NCDC",
+    val localPath: String? = null,
+    val isDownloaded: Boolean = false,
+    val version: Int = 1
 )

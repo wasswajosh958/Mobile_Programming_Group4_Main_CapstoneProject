@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -46,14 +48,12 @@ fun AboutScreen(navController: NavController) {
 
 @Composable
 fun AboutContent(onBack: () -> Unit) {
-    val checklist = listOf(
-        stringResource(id = R.string.about_item_kotlin_compose),
-        stringResource(id = R.string.about_item_mvvm),
-        stringResource(id = R.string.about_item_navigation),
-        stringResource(id = R.string.about_item_room),
-        stringResource(id = R.string.about_item_lazy_lists),
-        stringResource(id = R.string.about_item_testing),
-        stringResource(id = R.string.about_item_animations)
+    val guideItems = listOf(
+        stringResource(id = R.string.how_to_use_1),
+        stringResource(id = R.string.how_to_use_2),
+        stringResource(id = R.string.how_to_use_3),
+        stringResource(id = R.string.how_to_use_4),
+        stringResource(id = R.string.how_to_use_5)
     )
 
     Column(
@@ -113,39 +113,45 @@ fun AboutContent(onBack: () -> Unit) {
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(id = R.string.about_description),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
-                text = "Key Features implemented:",
+                text = stringResource(id = R.string.how_to_use_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                itemsIndexed(checklist) { index, item ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + slideInVertically(initialOffsetY = { it / (index + 2) })
+            guideItems.forEachIndexed { index, item ->
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { it / (index + 2) })
+                ) {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(12.dp),
+                        shadowElevation = 1.dp
                     ) {
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(12.dp),
-                            shadowElevation = 1.dp
-                        ) {
-                            Text(
-                                text = "✓ $item",
-                                modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                        Text(
+                            text = android.text.Html.fromHtml(item, android.text.Html.FROM_HTML_MODE_COMPACT).toString(),
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Normal
+                        )
                     }
                 }
             }
@@ -169,6 +175,7 @@ fun AboutContent(onBack: () -> Unit) {
         }
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

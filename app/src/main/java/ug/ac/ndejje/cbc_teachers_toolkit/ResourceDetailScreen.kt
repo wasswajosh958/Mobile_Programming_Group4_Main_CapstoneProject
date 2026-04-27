@@ -1,5 +1,6 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
@@ -67,6 +68,16 @@ import kotlinx.coroutines.delay
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Share
+import ug.ac.ndejje.cbc_teachers_toolkit.util.TextToSpeechHelper
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.material.icons.filled.FileDownloadDone
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openNotesAsPdf
+import ug.ac.ndejje.cbc_teachers_toolkit.util.shareNotes
+import ug.ac.ndejje.cbc_teachers_toolkit.util.shareScheme
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openDownloadedFile
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openUrl
 
 @Composable
@@ -81,6 +92,15 @@ fun ResourceDetailScreen(
     val isFavorite = uiState.favorites.contains(topicId)
     val resources by viewModel.observeResourcesForTopic(topicId).collectAsState(initial = emptyList())
 
+    val context = LocalContext.current
+    val ttsHelper = remember { TextToSpeechHelper(context) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            ttsHelper.shutdown()
+        }
+    }
+
     ResourceDetailContent(
         topic = topic,
         isFavorite = isFavorite,
@@ -89,13 +109,33 @@ fun ResourceDetailScreen(
         onBackClick = { navController.popBackStack() },
         onToggleFavorite = { viewModel.toggleFavorite(topicId) },
         onSaveNote = { note -> viewModel.saveNote(topicId, note) },
+        onShareNote = { note -> 
+            topic?.let { shareNotes(navController.context, it, note) }
+        },
+        onViewNote = { note ->
+            topic?.let { openNotesAsPdf(navController.context, it, note) }
+        },
+        onSpeak = { text -> ttsHelper.speak(text) },
         onOpenResource = { resource ->
             if (resource.type == "VIDEO") {
-                val encoded = java.net.URLEncoder.encode(resource.url, "UTF-8")
+                val pathOrUrl = if (resource.isDownloaded && resource.localPath?.isNotBlank() == true) {
+                    resource.localPath
+                } else {
+                    resource.url
+                }
+                val encoded = java.net.URLEncoder.encode(pathOrUrl, "UTF-8")
                 navController.navigate("video/$encoded")
             } else {
-                // Handled via openUrl in content
+                if (resource.isDownloaded && resource.localPath?.isNotBlank() == true) {
+                    openDownloadedFile(navController.context, resource.localPath)
+                } else {
+                    openUrl(navController.context, resource.url)
+                }
             }
+        },
+        onDownloadResource = { resource ->
+            // Trigger download logic
+            viewModel.downloadResource(navController.context, resource)
         },
         onOpenScheme = {
             navController.navigate("scheme?topicId=$topicId")
@@ -112,7 +152,11 @@ fun ResourceDetailContent(
     onBackClick: () -> Unit,
     onToggleFavorite: () -> Unit,
     onSaveNote: (String) -> Unit,
+    onShareNote: (String) -> Unit = {},
+    onViewNote: (String) -> Unit = {},
+    onSpeak: (String) -> Unit = {},
     onOpenResource: (TeachingResourceEntity) -> Unit,
+    onDownloadResource: (TeachingResourceEntity) -> Unit = {},
     onOpenScheme: () -> Unit
 ) {
     var noteDraft by remember(topic?.id) { mutableStateOf(persistedNote) }
@@ -230,21 +274,41 @@ fun ResourceDetailContent(
             if (downloadedResources.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 downloadedResources.forEach { resource ->
-                    OutlinedButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { onOpenResource(resource) },
-                        shape = RoundedCornerShape(12.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = when (resource.type) {
-                                "VIDEO" -> Icons.Filled.PlayCircle
-                                "NOTES" -> Icons.AutoMirrored.Filled.MenuBook
-                                else -> Icons.Filled.Link
-                            },
-                            contentDescription = null
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = resource.title)
+                        OutlinedButton(
+                            modifier = Modifier.weight(1f),
+                            onClick = { onOpenResource(resource) },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = when (resource.type) {
+                                    "VIDEO" -> Icons.Filled.PlayCircle
+                                    "NOTES" -> Icons.AutoMirrored.Filled.MenuBook
+                                    else -> Icons.Filled.Link
+                                },
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = resource.title,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                        }
+                        
+                        IconButton(
+                            onClick = { onDownloadResource(resource) },
+                            enabled = !resource.isDownloaded
+                        ) {
+                            Icon(
+                                imageVector = if (resource.isDownloaded) Icons.Default.FileDownloadDone else Icons.Default.FileDownload,
+                                contentDescription = if (resource.isDownloaded) "Downloaded" else "Download Offline",
+                                tint = if (resource.isDownloaded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -256,28 +320,32 @@ fun ResourceDetailContent(
                 title = "Lesson Plan",
                 content = topic.lessonPlan,
                 expanded = showLessonPlan,
-                onToggle = { showLessonPlan = !showLessonPlan }
+                onToggle = { showLessonPlan = !showLessonPlan },
+                onSpeak = { onSpeak(topic.lessonPlan) }
             )
 
             ExpandableSection(
                 title = "Project Ideas",
                 content = topic.projectIdeas,
                 expanded = showProjectIdeas,
-                onToggle = { showProjectIdeas = !showProjectIdeas }
+                onToggle = { showProjectIdeas = !showProjectIdeas },
+                onSpeak = { onSpeak(topic.projectIdeas) }
             )
 
             ExpandableSection(
                 title = "Assessment Rubric",
                 content = topic.assessmentRubric,
                 expanded = showAssessment,
-                onToggle = { showAssessment = !showAssessment }
+                onToggle = { showAssessment = !showAssessment },
+                onSpeak = { onSpeak(topic.assessmentRubric) }
             )
 
             ExpandableSection(
                 title = "Teaching Tips",
                 content = topic.teachingTips,
                 expanded = showTeachingTips,
-                onToggle = { showTeachingTips = !showTeachingTips }
+                onToggle = { showTeachingTips = !showTeachingTips },
+                onSpeak = { onSpeak(topic.teachingTips) }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -300,11 +368,48 @@ fun ResourceDetailContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             // --- My Notes ---
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "My Teaching Notes",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                if (noteDraft.isNotBlank()) {
+                    Row {
+                        IconButton(onClick = { onSpeak(noteDraft) }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.VolumeUp,
+                                contentDescription = "Read Aloud",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        IconButton(onClick = { onViewNote(noteDraft) }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.MenuBook,
+                                contentDescription = "View as PDF",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        IconButton(onClick = { onShareNote(noteDraft) }) {
+                            Icon(
+                                Icons.Default.Share,
+                                contentDescription = "Share Notes as PDF",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+            }
+
             OutlinedTextField(
                 value = noteDraft,
                 onValueChange = { noteDraft = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("My Teaching Notes") },
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 placeholder = { Text("Add your observations or adjustments for this topic...") },
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -357,7 +462,8 @@ fun ExpandableSection(
     title: String,
     content: String,
     expanded: Boolean,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    onSpeak: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -366,8 +472,12 @@ fun ExpandableSection(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+        ),
         onClick = onToggle
     ) {
         Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
@@ -379,8 +489,19 @@ fun ExpandableSection(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
                 )
+                
+                IconButton(onClick = { onSpeak() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                        contentDescription = "Read Aloud",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
                 Icon(
                     imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = null

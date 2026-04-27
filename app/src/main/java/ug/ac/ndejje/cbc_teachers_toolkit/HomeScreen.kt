@@ -25,8 +25,8 @@ import androidx.compose.material.icons.automirrored.filled.Note
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LibraryBooks
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Button
@@ -213,7 +213,7 @@ fun HomeContent(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ActionButton(
                     text = "Library",
-                    icon = Icons.Default.LibraryBooks,
+                    icon = Icons.AutoMirrored.Filled.LibraryBooks,
                     onClick = onLibraryClick,
                     modifier = Modifier.weight(1f)
                 )
@@ -303,7 +303,7 @@ fun HomeContent(
                         onClick = onLogout,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Icon(Icons.Default.Logout, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
                         Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                         Text(
                             text = stringResource(id = R.string.logout_button),

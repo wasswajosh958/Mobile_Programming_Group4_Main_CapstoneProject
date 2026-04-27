@@ -22,6 +22,10 @@ class TopicRepository(
         return topicDao.observeTopicById(id).map { it?.toDomain() }
     }
 
+    suspend fun getTopicSync(id: Int): Topic? {
+        return topicDao.getTopicById(id)?.toDomain()
+    }
+
     fun observeFavoriteIds(): Flow<Set<Int>> {
         return topicDao.observeFavoriteIds().map { it.toSet() }
     }
@@ -43,6 +47,14 @@ class TopicRepository(
 
     fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>> {
         return topicDao.observeResourcesForTopic(topicId)
+    }
+
+    fun observeDownloadedResources(): Flow<List<TeachingResourceEntity>> {
+        return topicDao.observeDownloadedResources()
+    }
+
+    suspend fun getUndownloadedResources(): List<TeachingResourceEntity> {
+        return topicDao.getUndownloadedResources()
     }
 
     suspend fun seedResourcesIfEmpty() {
@@ -75,6 +87,10 @@ class TopicRepository(
     fun observeSchemes(): Flow<List<SchemeOfWorkEntity>> = topicDao.observeSchemes()
 
     suspend fun insertScheme(scheme: SchemeOfWorkEntity): Long = topicDao.insertScheme(scheme)
+
+    suspend fun updateResourceDownloadStatus(key: String, path: String) {
+        topicDao.updateResourceDownloadStatus(key, path)
+    }
 
     suspend fun toggleFavorite(topicId: Int) {
         topicDao.toggleFavorite(topicId)

@@ -14,7 +14,7 @@ import androidx.room.RoomDatabase
         SchemeOfWorkEntity::class,
         UserEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

@@ -1,7 +1,11 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import ug.ac.ndejje.cbc_teachers_toolkit.util.downloadFile
+import ug.ac.ndejje.cbc_teachers_toolkit.util.getResourceDestinationFile
+import java.io.File
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,15 +40,18 @@ data class UpdatesUiState(
 
 data class SchemeDraftUiState(
     val teacherName: String = "",
+    val schoolName: String = "",
     val subject: String = "",
     val classLevel: String = "",
     val term: String = "",
     val week: String = "",
     val topicTitle: String = "",
+    val competency: String = "",
     val objectives: String = "",
     val activities: String = "",
     val resources: String = "",
-    val assessment: String = ""
+    val assessment: String = "",
+    val date: String = ""
 )
 
 enum class SchemeSaveStatus {
@@ -137,6 +144,12 @@ class SubjectViewModel(
         initialValue = emptyList()
     )
 
+    val downloadedResources = repository.observeDownloadedResources().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+        initialValue = emptyList()
+    )
+
     // Hosted JSON index (safe: metadata + links only). You can replace this later with your own hosting.
     private val resourceIndexUrl =
         "https://raw.githubusercontent.com/wasswajosh958/Mobile_Programming_Group4_Main_CapstoneProject/main/resources/resource_index.json"
@@ -195,6 +208,27 @@ class SubjectViewModel(
         _schemeDraftState.value = update(_schemeDraftState.value)
     }
 
+    fun downloadResource(context: Context, resource: TeachingResourceEntity) {
+        viewModelScope.launch {
+            val topic = topicById(resource.topicId) ?: return@launch
+            
+            val extension = when (resource.type) {
+                "VIDEO" -> "mp4"
+                "PDF_LINK", "NOTES" -> "pdf"
+                else -> "dat"
+            }
+            val fileName = "${resource.key.hashCode()}.$extension"
+            val destinationFile = getResourceDestinationFile(context, topic.subject, topic.classLevel, fileName)
+            
+            downloadFile(context, resource.url, destinationFile) { savedPath ->
+                // CRITICAL FIX: To prevent "corrupted" errors, we now update DB ONLY when download actually finishes.
+                viewModelScope.launch {
+                    repository.updateResourceDownloadStatus(resource.key, savedPath)
+                }
+            }
+        }
+    }
+
     fun prefillSchemeFromTopic(topicId: Int) {
         val topic = topicById(topicId) ?: return
         val current = _schemeDraftState.value
@@ -229,20 +263,24 @@ class SubjectViewModel(
             repository.insertScheme(
                 SchemeOfWorkEntity(
                     teacherName = draft.teacherName.trim(),
+                    schoolName = draft.schoolName.trim(),
                     subject = draft.subject.trim(),
                     classLevel = draft.classLevel.trim(),
                     term = draft.term.trim(),
                     week = weekValue,
                     topicTitle = draft.topicTitle.trim(),
+                    competency = draft.competency.trim(),
                     objectives = draft.objectives.trim(),
                     activities = draft.activities.trim(),
                     resources = draft.resources.trim(),
-                    assessment = draft.assessment.trim()
+                    assessment = draft.assessment.trim(),
+                    date = draft.date.trim()
                 )
             )
             _schemeSaveStatus.value = SchemeSaveStatus.SUCCESS
             _schemeDraftState.value = SchemeDraftUiState(
-                teacherName = draft.teacherName
+                teacherName = draft.teacherName,
+                schoolName = draft.schoolName
             )
         }
     }

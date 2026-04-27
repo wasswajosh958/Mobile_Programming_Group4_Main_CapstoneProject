@@ -1,5 +1,6 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
@@ -270,10 +271,14 @@ fun SubjectsContent(
                                     .animateContentSize(),
                                 onClick = { onTopicClick(topic.id) },
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                    containerColor = MaterialTheme.colorScheme.surface
                                 ),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                                shape = RoundedCornerShape(16.dp)
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                )
                             ) {
                                 Column(
                                     modifier = Modifier.padding(16.dp)

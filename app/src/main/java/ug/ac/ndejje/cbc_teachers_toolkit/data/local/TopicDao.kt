@@ -18,6 +18,9 @@ interface TopicDao {
     @Query("SELECT * FROM topics WHERE id = :id LIMIT 1")
     fun observeTopicById(id: Int): Flow<TopicEntity?>
 
+    @Query("SELECT * FROM topics WHERE id = :id LIMIT 1")
+    suspend fun getTopicById(id: Int): TopicEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(topics: List<TopicEntity>)
 
@@ -57,8 +60,20 @@ interface TopicDao {
     @Query("SELECT * FROM teaching_resources WHERE topicId = :topicId ORDER BY title")
     fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>>
 
+    @Query("SELECT * FROM teaching_resources WHERE isDownloaded = 1 ORDER BY title")
+    fun observeDownloadedResources(): Flow<List<TeachingResourceEntity>>
+
+    @Query("SELECT * FROM teaching_resources WHERE isDownloaded = 0 AND url NOT LIKE '%youtube.com%' AND url NOT LIKE '%google.com%' ORDER BY title")
+    suspend fun getUndownloadedResources(): List<TeachingResourceEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertResources(resources: List<TeachingResourceEntity>)
+
+    @Query("UPDATE teaching_resources SET localPath = :path, isDownloaded = 1 WHERE `key` = :key")
+    suspend fun updateResourceDownloadStatus(key: String, path: String)
+
+    @Query("SELECT * FROM teaching_resources WHERE `key` = :key LIMIT 1")
+    suspend fun getResourceByKey(key: String): TeachingResourceEntity?
 
     @Query("SELECT COUNT(*) FROM teaching_resources")
     suspend fun countResources(): Int

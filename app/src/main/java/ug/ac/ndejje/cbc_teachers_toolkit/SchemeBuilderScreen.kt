@@ -1,5 +1,6 @@
 package ug.ac.ndejje.cbc_teachers_toolkit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
@@ -26,10 +27,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Share
+import ug.ac.ndejje.cbc_teachers_toolkit.util.TextToSpeechHelper
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -66,7 +70,9 @@ import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.SuccessGreen
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.SuccessGreenContainer
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.WarningOrange
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.WarningOrangeContainer
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openScheme
 import ug.ac.ndejje.cbc_teachers_toolkit.util.shareScheme
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 
 @Composable
 fun SchemeBuilderScreen(
@@ -84,6 +90,15 @@ fun SchemeBuilderScreen(
         }
     }
 
+    val context = LocalContext.current
+    val ttsHelper = remember { TextToSpeechHelper(context) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            ttsHelper.shutdown()
+        }
+    }
+
     SchemeBuilderContent(
         draft = draft,
         saveStatus = saveStatus,
@@ -91,7 +106,8 @@ fun SchemeBuilderScreen(
         onBackClick = { navController.popBackStack() },
         onUpdateDraft = { viewModel.updateSchemeDraft(it) },
         onSaveScheme = { viewModel.saveSchemeDraft() },
-        onClearStatus = { viewModel.clearSchemeSaveStatus() }
+        onClearStatus = { viewModel.clearSchemeSaveStatus() },
+        onSpeak = { text -> ttsHelper.speak(text) }
     )
 }
 
@@ -103,7 +119,8 @@ fun SchemeBuilderContent(
     onBackClick: () -> Unit,
     onUpdateDraft: ((SchemeDraftUiState) -> SchemeDraftUiState) -> Unit,
     onSaveScheme: () -> Unit,
-    onClearStatus: () -> Unit
+    onClearStatus: () -> Unit,
+    onSpeak: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     var showGuide by remember { mutableStateOf(false) }
@@ -176,7 +193,7 @@ fun SchemeBuilderContent(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(
-                    imageVector = if (showGuide) Icons.Default.Info else Icons.Default.HelpOutline,
+                    imageVector = if (showGuide) Icons.Default.Info else Icons.AutoMirrored.Filled.HelpOutline,
                     contentDescription = null
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -241,12 +258,22 @@ fun SchemeBuilderContent(
             Spacer(modifier = Modifier.height(24.dp))
 
             // --- Form Section ---
-            SchemeSectionHeader(title = "General Information", icon = Icons.Default.Edit)
+            SchemeSectionHeader(
+        title = "General Information",
+        icon = Icons.Default.Edit,
+        onSpeak = { onSpeak("General Information. Teacher: ${draft.teacherName}. School: ${draft.schoolName}. Subject: ${draft.subject}. Class: ${draft.classLevel}.") }
+    )
 
             SchemeInputField(
                 value = draft.teacherName,
                 onValueChange = { value -> onUpdateDraft { it.copy(teacherName = value) } },
                 label = stringResource(id = R.string.teacher_name_label)
+            )
+
+            SchemeInputField(
+                value = draft.schoolName,
+                onValueChange = { value -> onUpdateDraft { it.copy(schoolName = value) } },
+                label = "School Name"
             )
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -283,13 +310,29 @@ fun SchemeBuilderContent(
                 }
             }
 
+            SchemeInputField(
+                value = draft.date,
+                onValueChange = { value -> onUpdateDraft { it.copy(date = value) } },
+                label = "Date"
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
-            SchemeSectionHeader(title = "Topic Details", icon = Icons.Default.Add)
+            SchemeSectionHeader(
+                title = "Topic Details",
+                icon = Icons.Default.Add,
+                onSpeak = { onSpeak("Topic Details. Topic: ${draft.topicTitle}. Competency: ${draft.competency}. Objectives: ${draft.objectives}. Activities: ${draft.activities}. Resources: ${draft.resources}. Assessment: ${draft.assessment}.") }
+            )
 
             SchemeInputField(
                 value = draft.topicTitle,
                 onValueChange = { value -> onUpdateDraft { it.copy(topicTitle = value) } },
                 label = stringResource(id = R.string.topic_title_label)
+            )
+            SchemeInputField(
+                value = draft.competency,
+                onValueChange = { value -> onUpdateDraft { it.copy(competency = value) } },
+                label = "Competency / Theme",
+                singleLine = false
             )
             SchemeInputField(
                 value = draft.objectives,
@@ -393,7 +436,11 @@ fun SchemeBuilderContent(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        )
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
@@ -418,9 +465,16 @@ fun SchemeBuilderContent(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
+                                IconButton(onClick = { openScheme(context, scheme) }) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.MenuBook,
+                                        contentDescription = "View PDF",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                                 IconButton(onClick = { shareScheme(context, scheme) }) {
                                     Icon(
-                                        Icons.Default.Share,
+                                        imageVector = Icons.Default.Share,
                                         contentDescription = "Share",
                                         tint = MaterialTheme.colorScheme.primary
                                     )
@@ -459,7 +513,11 @@ fun SchemeBuilderContent(
 }
 
 @Composable
-fun SchemeSectionHeader(title: String, icon: ImageVector) {
+fun SchemeSectionHeader(
+    title: String,
+    icon: ImageVector,
+    onSpeak: () -> Unit = {}
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -470,8 +528,17 @@ fun SchemeSectionHeader(title: String, icon: ImageVector) {
             text = title,
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.weight(1f)
         )
+        IconButton(onClick = onSpeak) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                contentDescription = "Read Aloud",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 
