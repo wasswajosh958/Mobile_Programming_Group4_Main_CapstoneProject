@@ -73,6 +73,9 @@ import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.WarningOrangeContainer
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openScheme
 import ug.ac.ndejje.cbc_teachers_toolkit.util.shareScheme
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 
 @Composable
 fun SchemeBuilderScreen(
@@ -83,6 +86,7 @@ fun SchemeBuilderScreen(
     val draft by viewModel.schemeDraftState.collectAsState()
     val saveStatus by viewModel.schemeSaveStatus.collectAsState()
     val schemes by viewModel.schemes.collectAsState()
+    val editingId by viewModel.editingSchemeId.collectAsState()
 
     LaunchedEffect(topicId) {
         if (topicId > 0) {
@@ -103,10 +107,14 @@ fun SchemeBuilderScreen(
         draft = draft,
         saveStatus = saveStatus,
         schemes = schemes,
+        isEditing = editingId != null,
         onBackClick = { navController.popBackStack() },
         onUpdateDraft = { viewModel.updateSchemeDraft(it) },
         onSaveScheme = { viewModel.saveSchemeDraft() },
         onClearStatus = { viewModel.clearSchemeSaveStatus() },
+        onEditScheme = { viewModel.setEditScheme(it) },
+        onDeleteScheme = { viewModel.deleteScheme(it) },
+        onCancelEdit = { viewModel.setEditScheme(null) },
         onSpeak = { text -> ttsHelper.speak(text) }
     )
 }
@@ -116,14 +124,42 @@ fun SchemeBuilderContent(
     draft: SchemeDraftUiState,
     saveStatus: SchemeSaveStatus,
     schemes: List<SchemeOfWorkEntity>,
+    isEditing: Boolean = false,
     onBackClick: () -> Unit,
     onUpdateDraft: ((SchemeDraftUiState) -> SchemeDraftUiState) -> Unit,
     onSaveScheme: () -> Unit,
     onClearStatus: () -> Unit,
+    onEditScheme: (SchemeOfWorkEntity) -> Unit = {},
+    onDeleteScheme: (SchemeOfWorkEntity) -> Unit = {},
+    onCancelEdit: () -> Unit = {},
     onSpeak: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     var showGuide by remember { mutableStateOf(false) }
+    var schemeToDelete by remember { mutableStateOf<SchemeOfWorkEntity?>(null) }
+
+    if (schemeToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { schemeToDelete = null },
+            title = { Text("Delete Scheme") },
+            text = { Text("Are you sure you want to delete this scheme for '${schemeToDelete?.topicTitle}'?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        schemeToDelete?.let { onDeleteScheme(it) }
+                        schemeToDelete = null
+                    }
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { schemeToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -163,13 +199,13 @@ fun SchemeBuilderContent(
                     Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
-                            text = stringResource(id = R.string.scheme_builder_title),
+                            text = "Scheme Builder",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = stringResource(id = R.string.scheme_builder_subtitle),
+                            text = "Generate and manage schemes of work",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -259,10 +295,20 @@ fun SchemeBuilderContent(
 
             // --- Form Section ---
             SchemeSectionHeader(
-        title = "General Information",
-        icon = Icons.Default.Edit,
-        onSpeak = { onSpeak("General Information. Teacher: ${draft.teacherName}. School: ${draft.schoolName}. Subject: ${draft.subject}. Class: ${draft.classLevel}.") }
-    )
+                title = if (isEditing) "Edit Scheme" else "General Information",
+                icon = if (isEditing) Icons.Default.Edit else Icons.Default.Info,
+                onSpeak = { onSpeak("General Information. Teacher: ${draft.teacherName}. School: ${draft.schoolName}. Subject: ${draft.subject}. Class: ${draft.classLevel}.") }
+            )
+
+            if (isEditing) {
+                OutlinedButton(
+                    onClick = onCancelEdit,
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Text("Cancel Editing")
+                }
+            }
 
             SchemeInputField(
                 value = draft.teacherName,
@@ -370,7 +416,7 @@ fun SchemeBuilderContent(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = stringResource(id = R.string.save_scheme_button),
+                    text = if (isEditing) "Update Scheme" else stringResource(id = R.string.save_scheme_button),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -465,6 +511,13 @@ fun SchemeBuilderContent(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
+                                IconButton(onClick = { onEditScheme(scheme) }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Edit",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                                 IconButton(onClick = { openScheme(context, scheme) }) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.MenuBook,
@@ -477,6 +530,13 @@ fun SchemeBuilderContent(
                                         imageVector = Icons.Default.Share,
                                         contentDescription = "Share",
                                         tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                IconButton(onClick = { schemeToDelete = scheme }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Delete",
+                                        tint = MaterialTheme.colorScheme.error
                                     )
                                 }
                             }

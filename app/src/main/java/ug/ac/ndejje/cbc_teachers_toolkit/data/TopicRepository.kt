@@ -88,6 +88,10 @@ class TopicRepository(
 
     suspend fun insertScheme(scheme: SchemeOfWorkEntity): Long = topicDao.insertScheme(scheme)
 
+    suspend fun updateScheme(scheme: SchemeOfWorkEntity) = topicDao.updateScheme(scheme)
+
+    suspend fun deleteScheme(scheme: SchemeOfWorkEntity) = topicDao.deleteScheme(scheme)
+
     suspend fun updateResourceDownloadStatus(key: String, path: String) {
         topicDao.updateResourceDownloadStatus(key, path)
     }

@@ -17,19 +17,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -43,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +56,8 @@ import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 @Composable
 fun SubjectsScreen(
     navController: NavController,
-    viewModel: SubjectViewModel
+    viewModel: SubjectViewModel,
+    onMenuClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -69,6 +71,7 @@ fun SubjectsScreen(
             viewModel.selectSubject(null)
             viewModel.updateSearchQuery("")
         },
+        onMenuClick = onMenuClick,
         onTopicClick = { topicId ->
             navController.navigate("resource/$topicId")
         }
@@ -82,6 +85,7 @@ fun SubjectsContent(
     onSelectSubject: (String?) -> Unit,
     onSelectClassLevel: (String?) -> Unit,
     onResetFilters: () -> Unit,
+    onMenuClick: () -> Unit = {},
     onTopicClick: (Int) -> Unit
 ) {
     Column(
@@ -89,7 +93,7 @@ fun SubjectsContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // --- Professional Header with Gradient ---
+        // --- Header Section ---
         val headerGradient = Brush.verticalGradient(
             colors = listOf(
                 MaterialTheme.colorScheme.primary,
@@ -105,31 +109,30 @@ fun SubjectsContent(
         ) {
             Column(
                 modifier = Modifier.padding(
-                    start = 20.dp,
+                    start = 12.dp,
                     end = 20.dp,
-                    top = 24.dp,
+                    top = 16.dp,
                     bottom = 32.dp
                 )
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Book,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(32.dp)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
-                            text = stringResource(id = R.string.available_topics),
+                            text = "Browse Subjects",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = "Explore resources by subject and class",
+                            text = "Find resources for your classes",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -140,9 +143,10 @@ fun SubjectsContent(
 
         Column(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(horizontal = 20.dp)
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Search Bar
             OutlinedTextField(

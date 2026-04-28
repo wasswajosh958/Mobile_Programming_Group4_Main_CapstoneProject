@@ -137,6 +137,8 @@ class SubjectViewModel(
     val schemeDraftState: StateFlow<SchemeDraftUiState> = _schemeDraftState
     private val _schemeSaveStatus = MutableStateFlow(SchemeSaveStatus.NONE)
     val schemeSaveStatus: StateFlow<SchemeSaveStatus> = _schemeSaveStatus
+    private val _editingSchemeId = MutableStateFlow<Long?>(null)
+    val editingSchemeId: StateFlow<Long?> = _editingSchemeId
 
     val schemes = repository.observeSchemes().stateIn(
         scope = viewModelScope,
@@ -241,6 +243,36 @@ class SubjectViewModel(
         }
     }
 
+    fun setEditScheme(scheme: SchemeOfWorkEntity?) {
+        if (scheme == null) {
+            _editingSchemeId.value = null
+            _schemeDraftState.value = SchemeDraftUiState()
+        } else {
+            _editingSchemeId.value = scheme.id
+            _schemeDraftState.value = SchemeDraftUiState(
+                teacherName = scheme.teacherName,
+                schoolName = scheme.schoolName,
+                subject = scheme.subject,
+                classLevel = scheme.classLevel,
+                term = scheme.term,
+                week = scheme.week.toString(),
+                topicTitle = scheme.topicTitle,
+                competency = scheme.competency,
+                objectives = scheme.objectives,
+                activities = scheme.activities,
+                resources = scheme.resources,
+                assessment = scheme.assessment,
+                date = scheme.date
+            )
+        }
+    }
+
+    fun deleteScheme(scheme: SchemeOfWorkEntity) {
+        viewModelScope.launch {
+            repository.deleteScheme(scheme)
+        }
+    }
+
     fun saveSchemeDraft() {
         val draft = _schemeDraftState.value
         val weekValue = draft.week.toIntOrNull()
@@ -260,24 +292,31 @@ class SubjectViewModel(
         }
 
         viewModelScope.launch {
-            repository.insertScheme(
-                SchemeOfWorkEntity(
-                    teacherName = draft.teacherName.trim(),
-                    schoolName = draft.schoolName.trim(),
-                    subject = draft.subject.trim(),
-                    classLevel = draft.classLevel.trim(),
-                    term = draft.term.trim(),
-                    week = weekValue,
-                    topicTitle = draft.topicTitle.trim(),
-                    competency = draft.competency.trim(),
-                    objectives = draft.objectives.trim(),
-                    activities = draft.activities.trim(),
-                    resources = draft.resources.trim(),
-                    assessment = draft.assessment.trim(),
-                    date = draft.date.trim()
-                )
+            val schemeEntity = SchemeOfWorkEntity(
+                id = _editingSchemeId.value ?: 0L,
+                teacherName = draft.teacherName.trim(),
+                schoolName = draft.schoolName.trim(),
+                subject = draft.subject.trim(),
+                classLevel = draft.classLevel.trim(),
+                term = draft.term.trim(),
+                week = weekValue,
+                topicTitle = draft.topicTitle.trim(),
+                competency = draft.competency.trim(),
+                objectives = draft.objectives.trim(),
+                activities = draft.activities.trim(),
+                resources = draft.resources.trim(),
+                assessment = draft.assessment.trim(),
+                date = draft.date.trim()
             )
+
+            if (_editingSchemeId.value == null) {
+                repository.insertScheme(schemeEntity)
+            } else {
+                repository.updateScheme(schemeEntity)
+            }
+
             _schemeSaveStatus.value = SchemeSaveStatus.SUCCESS
+            _editingSchemeId.value = null
             _schemeDraftState.value = SchemeDraftUiState(
                 teacherName = draft.teacherName,
                 schoolName = draft.schoolName

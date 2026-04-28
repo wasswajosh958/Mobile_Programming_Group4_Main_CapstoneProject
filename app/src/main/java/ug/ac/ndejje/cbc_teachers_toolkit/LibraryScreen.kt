@@ -48,13 +48,15 @@ import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openDownloadedFile
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openNotesAsPdf
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.OutlinedButton
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openUrl
 
 @Composable
 fun LibraryScreen(
     navController: NavController,
-    viewModel: SubjectViewModel
+    viewModel: SubjectViewModel,
+    onMenuClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val downloadedResources by viewModel.downloadedResources.collectAsState()
@@ -67,6 +69,7 @@ fun LibraryScreen(
         downloadedResources = downloadedResources,
         notes = uiState.notes,
         onBackClick = { navController.popBackStack() },
+        onMenuClick = onMenuClick,
         onTopicClick = { topicId -> navController.navigate("resource/$topicId") },
         onResourceClick = { resource ->
             if (resource.type == "VIDEO") {
@@ -98,6 +101,7 @@ fun LibraryContent(
     downloadedResources: List<TeachingResourceEntity> = emptyList(),
     notes: Map<Int, String>,
     onBackClick: () -> Unit,
+    onMenuClick: () -> Unit = {},
     onTopicClick: (Int) -> Unit,
     onResourceClick: (TeachingResourceEntity) -> Unit = {},
     onViewNote: (Topic, String) -> Unit = { _, _ -> }
@@ -130,23 +134,23 @@ fun LibraryContent(
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = onMenuClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
-                            text = stringResource(id = R.string.my_library),
+                            text = "My Library",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = stringResource(id = R.string.library_summary, favoriteTopics.size, notedTopics.size),
+                            text = "Your favorites, notes and downloads",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )

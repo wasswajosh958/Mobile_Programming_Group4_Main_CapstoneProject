@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -46,13 +46,15 @@ import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 @Composable
 fun UpdatesScreen(
     navController: NavController,
-    viewModel: SubjectViewModel
+    viewModel: SubjectViewModel,
+    onMenuClick: () -> Unit = {}
 ) {
     val updates by viewModel.updatesState.collectAsState()
     UpdatesContent(
         updates = updates,
         onUpdateNow = { viewModel.updateResourcesNow() },
-        onBack = { navController.popBackStack() }
+        onBack = { navController.popBackStack() },
+        onMenuClick = onMenuClick
     )
 }
 
@@ -60,7 +62,8 @@ fun UpdatesScreen(
 fun UpdatesContent(
     updates: UpdatesUiState,
     onUpdateNow: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onMenuClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -90,23 +93,23 @@ fun UpdatesContent(
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = onMenuClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
-                            text = stringResource(id = R.string.updates_title),
+                            text = "App Updates",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = stringResource(id = R.string.updates_subtitle),
+                            text = "Keep your resources up to date",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -121,7 +124,7 @@ fun UpdatesContent(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Status Card
             Card(

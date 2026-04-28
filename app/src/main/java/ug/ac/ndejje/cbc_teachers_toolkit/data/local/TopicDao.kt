@@ -84,4 +84,10 @@ interface TopicDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertScheme(scheme: SchemeOfWorkEntity): Long
+
+    @androidx.room.Update
+    suspend fun updateScheme(scheme: SchemeOfWorkEntity)
+
+    @androidx.room.Delete
+    suspend fun deleteScheme(scheme: SchemeOfWorkEntity)
 }

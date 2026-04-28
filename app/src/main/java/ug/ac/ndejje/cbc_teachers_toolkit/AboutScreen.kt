@@ -14,13 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,14 +38,21 @@ import androidx.navigation.NavController
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 
 @Composable
-fun AboutScreen(navController: NavController) {
+fun AboutScreen(
+    navController: NavController,
+    onMenuClick: () -> Unit = {}
+) {
     AboutContent(
-        onBack = { navController.popBackStack() }
+        onBack = { navController.popBackStack() },
+        onMenuClick = onMenuClick
     )
 }
 
 @Composable
-fun AboutContent(onBack: () -> Unit) {
+fun AboutContent(
+    onBack: () -> Unit,
+    onMenuClick: () -> Unit = {}
+) {
     val guideItems = listOf(
         stringResource(id = R.string.how_to_use_1),
         stringResource(id = R.string.how_to_use_2),
@@ -84,23 +89,23 @@ fun AboutContent(onBack: () -> Unit) {
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = onBack) {
+                    IconButton(onClick = onMenuClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
-                            text = stringResource(id = R.string.about_title),
+                            text = "About CBC Toolkit",
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = stringResource(id = R.string.about_subtitle),
+                            text = "Learn how to use the app effectively",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -111,7 +116,7 @@ fun AboutContent(onBack: () -> Unit) {
 
         Column(
             modifier = Modifier
-                .weight(1f)
+                .fillMaxSize()
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
@@ -172,10 +177,10 @@ fun AboutContent(onBack: () -> Unit) {
                     fontWeight = FontWeight.Bold
                 )
             }
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
