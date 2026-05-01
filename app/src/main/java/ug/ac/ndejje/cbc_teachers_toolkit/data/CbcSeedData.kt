@@ -5,309 +5,196 @@ import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 
 object CbcSeedData {
     val starterResources: List<TeachingResourceEntity> = listOf(
-        // --- ATTACHED LOCAL RESOURCES (After you download and add to assets/Resources/) ---
+        // --- ATTACHED LOCAL RESOURCES ONLY (All others removed as requested) ---
+        
+        // S.1 Physics: Mechanics and Energy (Topic 17)
         TeachingResourceEntity(
-            key = "1|VIDEO|local",
-            topicId = 1,
-            title = "S.1 Biology: Classification (Offline Video)",
-            type = "VIDEO",
-            url = "asset:///Resources/biology_s1_classification.mp4",
-            source = "Internal Storage",
-            isDownloaded = true,
-            localPath = "Resources/biology_s1_classification.mp4"
-        ),
-        TeachingResourceEntity(
-            key = "17|NOTES|local",
+            key = "17|NOTES|local_force",
             topicId = 17,
-            title = "S.1 Physics: Force and Motion (Official PDF)",
+            title = "S.1 Physics: Forces and Motion (Summary Notes)",
             type = "NOTES",
-            url = "asset:///Resources/physics_s1_force.pdf",
-            source = "NCDC Prototype",
+            url = "asset:///Resources/Summary Notes - Topic 1 Forces and Motion - Edexcel Physics IGCSE.pdf",
+            source = "Edexcel IGCSE",
             isDownloaded = true,
-            localPath = "Resources/physics_s1_force.pdf"
+            localPath = "Resources/Summary Notes - Topic 1 Forces and Motion - Edexcel Physics IGCSE.pdf"
         ),
         TeachingResourceEntity(
-            key = "5|NOTES|local",
-            topicId = 5,
-            title = "S.1 Math: Sets and Venn Diagrams (PDF)",
-            type = "NOTES",
-            url = "asset:///Resources/math_s1_sets.pdf",
-            source = "NCDC Prototype",
-            isDownloaded = true,
-            localPath = "Resources/math_s1_sets.pdf"
-        ),
-        TeachingResourceEntity(
-            key = "45|VIDEO|local",
-            topicId = 45,
-            title = "S.1 ICT: Intro to Computers (Offline Video)",
+            key = "17|VIDEO|local_force",
+            topicId = 17,
+            title = "What is Force? - Part 1 (Video)",
             type = "VIDEO",
-            url = "asset:///Resources/ict_s1_intro.mp4",
-            source = "Internal Storage",
+            url = "asset:///Resources/What is Force_ - Part 1_ Forces and Motion _ Physics _ Infinity Learn NEET.mp4.mp4",
+            source = "Infinity Learn",
             isDownloaded = true,
-            localPath = "Resources/ict_s1_intro.mp4"
+            localPath = "Resources/What is Force_ - Part 1_ Forces and Motion _ Physics _ Infinity Learn NEET.mp4.mp4"
         ),
 
-        // --- REMOTE FALLBACKS ---
+        // S.2 Physics: Work, Energy and Power (Mapped to Topic 17)
         TeachingResourceEntity(
-            key = "17|VIDEO|https://www.youtube.com/watch?v=ZM8ECpBuQYE",
+            key = "17|NOTES|local_work",
             topicId = 17,
-            title = "S.1 Physics: Force and Motion (Video Lesson)",
+            title = "S.2 Physics: Work, Energy and Power (Handout)",
+            type = "NOTES",
+            url = "asset:///Resources/O-Level-New-curriculum-Physics-SV-topic-5-WORK-ENERGY-AND-POWER.pdf",
+            source = "NCDC Prototype",
+            isDownloaded = true,
+            localPath = "Resources/O-Level-New-curriculum-Physics-SV-topic-5-WORK-ENERGY-AND-POWER.pdf"
+        ),
+        TeachingResourceEntity(
+            key = "17|VIDEO|local_work",
+            topicId = 17,
+            title = "Work, Energy, and Power Introduction (Video)",
             type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=ZM8ECpBuQYE",
-            source = "YouTube"
+            url = "asset:///Resources/Work, Energy, and Power - Basic Introduction.mp4.mp4",
+            source = "YouTube Education",
+            isDownloaded = true,
+            localPath = "Resources/Work, Energy, and Power - Basic Introduction.mp4.mp4"
         ),
         TeachingResourceEntity(
-            key = "18|VIDEO|https://www.youtube.com/watch?v=2WPT06R4Ac4",
-            topicId = 18,
-            title = "S.2 Physics: Work, Energy and Power (Video)",
+            key = "17|VIDEO|local_work_efficiency",
+            topicId = 17,
+            title = "Energy, Work, Power and Efficiency (Video)",
             type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=2WPT06R4Ac4",
-            source = "YouTube"
-        ),
-        TeachingResourceEntity(
-            key = "18|NOTES|https://ncdc.go.ug/sites/default/files/S2_PHYSICS_PROTOTYPE.pdf",
-            topicId = 18,
-            title = "S.2 Physics: Work and Energy (PDF Guide)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S2_PHYSICS_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "19|NOTES|https://ncdc.go.ug/sites/default/files/S3_PHYSICS_PROTOTYPE.pdf",
-            topicId = 19,
-            title = "S.3 Physics: Electricity and Circuits (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S3_PHYSICS_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "19|VIDEO|https://www.youtube.com/watch?v=mc979OhitAg",
-            topicId = 19,
-            title = "S.3 Physics: Electric Circuits (Video)",
-            type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=mc979OhitAg",
-            source = "YouTube"
-        ),
-        TeachingResourceEntity(
-            key = "20|NOTES|https://ncdc.go.ug/sites/default/files/S4_PHYSICS_PROTOTYPE.pdf",
-            topicId = 20,
-            title = "S.4 Physics: Atomic and Nuclear Physics (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S4_PHYSICS_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "16|NOTES|https://ncdc.go.ug/sites/default/files/S4_CHEMISTRY_PROTOTYPE.pdf",
-            topicId = 16,
-            title = "S.4 Chemistry: Organic Chemistry (PDF Guide)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S4_CHEMISTRY_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "4|NOTES|https://ncdc.go.ug/sites/default/files/S4_BIOLOGY_PROTOTYPE.pdf",
-            topicId = 4,
-            title = "S.4 Biology: Ecology and environment (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S4_BIOLOGY_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "8|NOTES|https://ncdc.go.ug/sites/default/files/S4_MATH_PROTOTYPE.pdf",
-            topicId = 8,
-            title = "S.4 Math: Calculus and Statistics (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S4_MATH_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
+            url = "asset:///Resources/Energy, Work, Power and efficiency for IGCSE, O level and GCSE Physics.mp4.mp4",
+            source = "GCSE Physics",
+            isDownloaded = true,
+            localPath = "Resources/Energy, Work, Power and efficiency for IGCSE, O level and GCSE Physics.mp4.mp4"
         ),
 
-        // --- CHEMISTRY ---
+        // S.1 Chemistry: Particulate Nature of Matter (Topic 13)
         TeachingResourceEntity(
-            key = "13|NOTES|https://ncdc.go.ug/sites/default/files/S1_CHEMISTRY_PROTOTYPE.pdf",
+            key = "13|VIDEO|local_matter",
+            topicId = 13,
+            title = "S.1 Chemistry: States of Matter (Offline Video)",
+            type = "VIDEO",
+            url = "asset:///Resources/states of matter.mp4",
+            source = "Internal Storage",
+            isDownloaded = true,
+            localPath = "Resources/states of matter.mp4"
+        ),
+        TeachingResourceEntity(
+            key = "13|NOTES|local_matter",
             topicId = 13,
             title = "S.1 Chemistry: States of Matter (PDF Guide)",
             type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_CHEMISTRY_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "13|VIDEO|https://www.youtube.com/watch?v=HAPc6JH85pM",
-            topicId = 13,
-            title = "S.1 Chemistry: States of Matter (Video Lesson)",
-            type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=HAPc6JH85pM",
-            source = "Khan Academy"
-        ),
-        TeachingResourceEntity(
-            key = "14|VIDEO|https://www.youtube.com/watch?v=L2Q2q20EkeA",
-            topicId = 14,
-            title = "S.2 Chemistry: Chemical Bonding (Video)",
-            type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=L2Q2q20EkeA",
-            source = "Khan Academy"
-        ),
-        TeachingResourceEntity(
-            key = "14|NOTES|https://ncdc.go.ug/sites/default/files/S2_CHEMISTRY_PROTOTYPE.pdf",
-            topicId = 14,
-            title = "S.2 Chemistry: Chemical Bonding (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S2_CHEMISTRY_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "15|NOTES|https://ncdc.go.ug/sites/default/files/S3_CHEMISTRY_PROTOTYPE.pdf",
-            topicId = 15,
-            title = "S.3 Chemistry: Acids, Bases and Salts (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S3_CHEMISTRY_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "15|VIDEO|https://www.youtube.com/watch?v=ANi709MYn8E",
-            topicId = 15,
-            title = "S.3 Chemistry: Acids and Bases (Video)",
-            type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=ANi709MYn8E",
-            source = "YouTube"
+            url = "asset:///Resources/5.-State-of-matter.pdf",
+            source = "Chemistry Guide",
+            isDownloaded = true,
+            localPath = "Resources/5.-State-of-matter.pdf"
         ),
 
-        // --- OTHER ---
+        // S.2 Chemistry: Chemical Bonding / Periodic Table (Topic 14)
         TeachingResourceEntity(
-            key = "1|VIDEO|https://www.youtube.com/watch?v=vqxomJIBGcY",
-            topicId = 1,
-            title = "S.1 Biology: Classification (Video)",
+            key = "14|VIDEO|local_periodic",
+            topicId = 14,
+            title = "The Periodic Table Explained (Video)",
             type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=vqxomJIBGcY",
-            source = "YouTube Education"
+            url = "asset:///Resources/The Periodic Table Explained.mp4.mp4",
+            source = "Internal Storage",
+            isDownloaded = true,
+            localPath = "Resources/The Periodic Table Explained.mp4.mp4"
         ),
+
+        // S.4 Chemistry: Organic Chemistry (Topic 16)
         TeachingResourceEntity(
-            key = "5|NOTES|https://ncdc.go.ug/sites/default/files/S1_MATH_PROTOTYPE.pdf",
-            topicId = 5,
-            title = "S.1 Math: Sets and Venn Diagrams (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_MATH_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        // --- ADDED RESOURCES FOR OTHER SUBJECTS ---
-        TeachingResourceEntity(
-            key = "9|NOTES|https://ncdc.go.ug/sites/default/files/S1_ENGLISH_PROTOTYPE.pdf",
-            topicId = 9,
-            title = "S.1 English: Narrative Writing (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_ENGLISH_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "21|NOTES|https://ncdc.go.ug/sites/default/files/S1_HISTORY_PROTOTYPE.pdf",
-            topicId = 21,
-            title = "S.1 History: The Cradle of Mankind (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_HISTORY_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "25|NOTES|https://ncdc.go.ug/sites/default/files/S1_GEOGRAPHY_PROTOTYPE.pdf",
-            topicId = 25,
-            title = "S.1 Geography: Physical Geography (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_GEOGRAPHY_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "33|NOTES|https://ncdc.go.ug/sites/default/files/S1_KISWAHILI_PROTOTYPE.pdf",
-            topicId = 33,
-            title = "S.1 Kiswahili: Lugha na Mawasiliano (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_KISWAHILI_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "37|NOTES|https://ncdc.go.ug/sites/default/files/S1_CRE_PROTOTYPE.pdf",
-            topicId = 37,
-            title = "S.1 R.E: God's Creation (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_CRE_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "41|NOTES|https://ncdc.go.ug/sites/default/files/S1_AGRIC_PROTOTYPE.pdf",
-            topicId = 41,
-            title = "S.1 Agriculture: Intro to Farming (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_AGRIC_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "45|VIDEO|https://www.youtube.com/watch?v=S_0mXbYJ8rE",
-            topicId = 45,
-            title = "S.1 ICT: Intro to Computers (Video)",
+            key = "16|VIDEO|local_organic",
+            topicId = 16,
+            title = "Organic Chemistry in 8 Minutes (Video)",
             type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=S_0mXbYJ8rE",
-            source = "YouTube"
+            url = "asset:///Resources/ORGANIC CHEMISTRY Explained in 8 Minutes.mp4.mp4",
+            source = "Quick Chemistry",
+            isDownloaded = true,
+            localPath = "Resources/ORGANIC CHEMISTRY Explained in 8 Minutes.mp4.mp4"
         ),
+
+        // S.1 Chemistry: More Matter Resources
         TeachingResourceEntity(
-            key = "29|NOTES|https://ncdc.go.ug/sites/default/files/S1_ENTREPRENEURSHIP_PROTOTYPE.pdf",
-            topicId = 29,
-            title = "S.1 Entrepreneurship: Innovation (PDF)",
+            key = "13|NOTES|local_matter_handbook",
+            topicId = 13,
+            title = "States of Matter Handbook (PDF)",
             type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_ENTREPRENEURSHIP_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
+            url = "asset:///Resources/EL11_StatesofMatter_Handbook.pdf",
+            source = "Education Hub",
+            isDownloaded = true,
+            localPath = "Resources/EL11_StatesofMatter_Handbook.pdf"
         ),
         TeachingResourceEntity(
-            key = "50|VIDEO|https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            topicId = 50,
-            title = "S.1 Performing Arts: Music & Dance (Video)",
+            key = "13|VIDEO|local_matter_gcse",
+            topicId = 13,
+            title = "GCSE Chemistry: States of Matter (Video)",
             type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-            source = "YouTube"
+            url = "asset:///Resources/GCSE Chemistry - States of Matter & Changing State.mp4.mp4",
+            source = "GCSE Revision",
+            isDownloaded = true,
+            localPath = "Resources/GCSE Chemistry - States of Matter & Changing State.mp4.mp4"
         ),
+
+        // S.2 Physics: Waves (Topic 18)
         TeachingResourceEntity(
-            key = "51|NOTES|https://ncdc.go.ug/sites/default/files/S1_ART_DESIGN_PROTOTYPE.pdf",
-            topicId = 51,
-            title = "S.1 Art and Design: Drawing (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_ART_DESIGN_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "52|NOTES|https://ncdc.go.ug/sites/default/files/S1_FOOD_NUTRITION_PROTOTYPE.pdf",
-            topicId = 52,
-            title = "S.1 Nutrition: Safety & Hygiene (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_FOOD_NUTRITION_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "53|NOTES|https://ncdc.go.ug/sites/default/files/S1_TECH_DESIGN_PROTOTYPE.pdf",
-            topicId = 53,
-            title = "S.1 Technology: Technical Drawing (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_TECH_DESIGN_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
-        ),
-        TeachingResourceEntity(
-            key = "54|VIDEO|https://www.youtube.com/watch?v=7uK8_6E6L_M",
-            topicId = 54,
-            title = "S.1 Physical Education: Athletics (Video)",
+            key = "18|VIDEO|local_waves_long",
+            topicId = 18,
+            title = "Transverse & Longitudinal Waves (Video)",
             type = "VIDEO",
-            url = "https://www.youtube.com/watch?v=7uK8_6E6L_M",
-            source = "YouTube"
+            url = "asset:///Resources/Transverse and Longitudinal Waves.mp4.mp4",
+            source = "Science Explained",
+            isDownloaded = true,
+            localPath = "Resources/Transverse and Longitudinal Waves.mp4.mp4"
         ),
         TeachingResourceEntity(
-            key = "55|NOTES|https://ncdc.go.ug/sites/default/files/S1_LOCAL_LANGUAGE_PROTOTYPE.pdf",
-            topicId = 55,
-            title = "S.1 Local Language: Grammar & Culture (PDF)",
-            type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_LOCAL_LANGUAGE_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
+            key = "18|VIDEO|local_waves_fuse",
+            topicId = 18,
+            title = "Wave Motion - FuseSchool (Video)",
+            type = "VIDEO",
+            url = "asset:///Resources/Wave Motion _ Waves _ Physics _ FuseSchool.mp4.mp4",
+            source = "FuseSchool",
+            isDownloaded = true,
+            localPath = "Resources/Wave Motion _ Waves _ Physics _ FuseSchool.mp4.mp4"
         ),
         TeachingResourceEntity(
-            key = "56|NOTES|https://ncdc.go.ug/sites/default/files/S1_FOREIGN_LANGUAGE_PROTOTYPE.pdf",
-            topicId = 56,
-            title = "S.1 Foreign Languages: Basic Comm (PDF)",
+            key = "18|NOTES|local_waves_notes",
+            topicId = 18,
+            title = "S.2 Physics: Waves (Summary Notes)",
             type = "NOTES",
-            url = "https://ncdc.go.ug/sites/default/files/S1_FOREIGN_LANGUAGE_PROTOTYPE.pdf",
-            source = "NCDC Uganda"
+            url = "asset:///Resources/Summary Notes - Topic 3 CAIE Physics IGCSE.pdf",
+            source = "CAIE IGCSE",
+            isDownloaded = true,
+            localPath = "Resources/Summary Notes - Topic 3 CAIE Physics IGCSE.pdf"
+        ),
+
+        // S.1 Physics: Mechanics and Energy (Topic 17)
+        TeachingResourceEntity(
+            key = "17|NOTES|local_work_extra",
+            topicId = 17,
+            title = "Physical Science: Work energy and power (PDF)",
+            type = "NOTES",
+            url = "asset:///Resources/PHYSICAL SCIENCE_ Work energy and power.pdf",
+            source = "Physical Science",
+            isDownloaded = true,
+            localPath = "Resources/PHYSICAL SCIENCE_ Work energy and power.pdf"
+        ),
+
+        // S.1 Chemistry: Particulate Nature of Matter (Topic 13)
+        TeachingResourceEntity(
+            key = "13|VIDEO|local_gen_chem",
+            topicId = 13,
+            title = "General Chemistry Explained (Video)",
+            type = "VIDEO",
+            url = "asset:///Resources/GENERAL CHEMISTRY explained in 19 Minutes.mp4.mp4",
+            source = "Chemistry Essentials",
+            isDownloaded = true,
+            localPath = "Resources/GENERAL CHEMISTRY explained in 19 Minutes.mp4.mp4"
+        ),
+
+        // S.2 Chemistry: Periodic Table (Topic 14)
+        TeachingResourceEntity(
+            key = "14|VIDEO|local_periodic_trends",
+            topicId = 14,
+            title = "Periodic Table Trends (Video)",
+            type = "VIDEO",
+            url = "asset:///Resources/The Periodic Table_ Atomic Radius, Ionization Energy, and Electronegativity.mp4.mp4",
+            source = "Chemistry Trends",
+            isDownloaded = true,
+            localPath = "Resources/The Periodic Table_ Atomic Radius, Ionization Energy, and Electronegativity.mp4.mp4"
         )
     )
 

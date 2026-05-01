@@ -163,6 +163,14 @@ class TopicRepository(
         topicDao.toggleFavorite(topicId)
     }
 
+    suspend fun toggleResourceFavorite(resourceKey: String) {
+        topicDao.toggleResourceFavorite(resourceKey)
+    }
+
+    fun observeFavoriteResources(): Flow<List<TeachingResourceEntity>> {
+        return topicDao.observeFavoriteResources()
+    }
+
     suspend fun saveNote(topicId: Int, note: String) {
         if (note.isBlank()) {
             topicDao.deleteNote(topicId)
