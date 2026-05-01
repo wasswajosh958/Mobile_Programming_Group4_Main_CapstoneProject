@@ -26,6 +26,7 @@ Our Screens
 6. Scheme Builder: A form to help teachers plan their work.
 
 Testing
-We wrote some tests to make sure the favorites work and the navigation doesn't break. 
+We wrote some tests to make sure the favorites work and the navigation doesn't break
+When testing, we used physic and chemistry inorder not to make the app so bulk for proper submission
 
 This project was done by Group 4 students.
