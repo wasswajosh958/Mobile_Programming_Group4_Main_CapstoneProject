@@ -95,7 +95,20 @@ fun downloadFile(
 
 fun openDownloadedFile(context: Context, filePath: String) {
     try {
-        val file = File(filePath)
+        val file = if (filePath.startsWith("asset:///")) {
+            // Handle asset by copying to cache
+            val assetPath = filePath.substring("asset:///".length)
+            val cacheFile = File(context.cacheDir, File(assetPath).name)
+            context.assets.open(assetPath).use { input ->
+                FileOutputStream(cacheFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            cacheFile
+        } else {
+            File(filePath)
+        }
+
         if (!file.exists() || file.length() == 0L) {
             Toast.makeText(context, "File is missing or corrupted. Please redownload.", Toast.LENGTH_LONG).show()
             return

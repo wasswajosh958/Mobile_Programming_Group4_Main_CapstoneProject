@@ -72,6 +72,12 @@ interface TopicDao {
     @Query("UPDATE teaching_resources SET localPath = :path, isDownloaded = 1 WHERE `key` = :key")
     suspend fun updateResourceDownloadStatus(key: String, path: String)
 
+    @Query("UPDATE teaching_resources SET isFavorite = NOT isFavorite WHERE `key` = :key")
+    suspend fun toggleResourceFavorite(key: String)
+
+    @Query("SELECT * FROM teaching_resources WHERE isFavorite = 1 ORDER BY title")
+    fun observeFavoriteResources(): Flow<List<TeachingResourceEntity>>
+
     @Query("SELECT * FROM teaching_resources WHERE `key` = :key LIMIT 1")
     suspend fun getResourceByKey(key: String): TeachingResourceEntity?
 

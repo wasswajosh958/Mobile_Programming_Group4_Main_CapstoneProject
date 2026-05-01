@@ -30,12 +30,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        // Background sync disabled to strictly follow the offline-first model 
+        // using bundled assets and prevent internet dependency.
+        /*
         scheduleSync()
-
-        // Trigger an immediate sync on startup to ensure fresh data
         WorkManager.getInstance(applicationContext).enqueue(
             androidx.work.OneTimeWorkRequestBuilder<SyncWorker>().build()
         )
+        */
 
         setContent {
             CbcToolkitAppRoot()

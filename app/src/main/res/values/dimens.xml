@@ -4,7 +4,30 @@
     <dimen name="padding_medium">16dp</dimen>
     <dimen name="padding_large">24dp</dimen>
     <dimen name="padding_xlarge">32dp</dimen>
+    <dimen name="padding_xxlarge">48dp</dimen>
+
     <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_elevation_small">2dp</dimen>
+    <dimen name="card_corner_radius">16dp</dimen>
+    <dimen name="chip_corner_radius">12dp</dimen>
+    <dimen name="header_corner_radius">32dp</dimen>
+
     <dimen name="search_bar_corner">16dp</dimen>
     <dimen name="login_logo_size">56dp</dimen>
+    <dimen name="splash_logo_size">100dp</dimen>
+    <dimen name="icon_size_medium">32dp</dimen>
+    <dimen name="icon_size_large">64dp</dimen>
+    <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_28dp">28dp</dimen>
+
+    <dimen name="border_thin">1dp</dimen>
+    <dimen name="folder_width">140dp</dimen>
+    <dimen name="folder_height">100dp</dimen>
+    <dimen name="padding_12dp">12dp</dimen>
+    <dimen name="padding_20dp">20dp</dimen>
+    <dimen name="padding_10dp">10dp</dimen>
+    <dimen name="zero_dp">0dp</dimen>
+    <dimen name="button_height_large">64dp</dimen>
+    <dimen name="button_height_medium">56dp</dimen>
+    <dimen name="padding_form">24dp</dimen>
 </resources>

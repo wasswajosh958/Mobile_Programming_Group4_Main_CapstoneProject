@@ -4,6 +4,7 @@ import android.content.Context
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.AppDatabase
 import ug.ac.ndejje.cbc_teachers_toolkit.data.remote.FirebaseSyncManager
 
+// This class helps to manage our database and repositories in one place
 class AppContainer(context: Context) {
     private val database = AppDatabase.getInstance(context)
     private val firebaseSyncManager = FirebaseSyncManager()

@@ -1,100 +1,404 @@
 package ug.ac.ndejje.cbc_teachers_toolkit.ui.screens
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
+import ug.ac.ndejje.cbc_teachers_toolkit.R
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Note
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.*
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.SettingsSuggest
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import ug.ac.ndejje.cbc_teachers_toolkit.R
-import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
-import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+data class SubjectItem(val name: String)
+
 @Composable
 fun HomeScreen(
     navController: NavController,
-    onNavigateToAbout: () -> Unit,
-    viewModel: SubjectViewModel = viewModel(factory = SubjectViewModel.Factory)
+    viewModel: SubjectViewModel,
+    teacherName: String = "Teacher",
+    onMenuClick: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
-    val topics by viewModel.topics.collectAsState()
-    val favoriteIds by viewModel.favoriteIds.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val subjects = uiState.availableSubjects.map { SubjectItem(it) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(id = R.string.app_name)) },
-                actions = {
-                    IconButton(onClick = onNavigateToAbout) {
-                        Icon(Icons.Default.Info, contentDescription = "About")
+    HomeContent(
+        teacherName = teacherName,
+        favoritesCount = uiState.favorites.size,
+        notesCount = uiState.notes.size,
+        subjects = subjects,
+        onLibraryClick = { navController.navigate("library") },
+        onAboutClick = { navController.navigate("about") },
+        onSchemeClick = { navController.navigate("scheme") },
+        onLogout = onLogout,
+        onMenuClick = onMenuClick,
+        onOpenTopics = { subjectName ->
+            viewModel.selectSubject(subjectName)
+            navController.navigate("subjects")
+        }
+    )
+}
+
+@Composable
+fun HomeContent(
+    teacherName: String,
+    favoritesCount: Int,
+    notesCount: Int,
+    subjects: List<SubjectItem>,
+    onLibraryClick: () -> Unit,
+    onAboutClick: () -> Unit,
+    onSchemeClick: () -> Unit,
+    onLogout: () -> Unit,
+    onMenuClick: () -> Unit,
+    onOpenTopics: (String) -> Unit
+) {
+    var showContent by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        showContent = true
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // This is the top part of the home screen with the blue background
+        val headerGradient = Brush.verticalGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+            )
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(bottomStart = dimensionResource(id = R.dimen.header_corner_radius), bottomEnd = dimensionResource(id = R.dimen.header_corner_radius)))
+                .background(brush = headerGradient)
+        ) {
+            Column(
+                modifier = Modifier.padding(
+                    start = dimensionResource(id = R.dimen.padding_12dp),
+                    end = dimensionResource(id = R.dimen.padding_20dp),
+                    top = dimensionResource(id = R.dimen.padding_medium),
+                    bottom = dimensionResource(id = R.dimen.header_corner_radius)
+                )
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(id = R.string.menu),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
+                    Column {
+                        Text(
+                            text = stringResource(id = R.string.home_welcome, teacherName),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                        Text(
+                            text = stringResource(id = R.string.home_subtitle),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                        )
                     }
                 }
-            )
-        }
-    ) { padding ->
-        if (topics.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                items(topics) { topic ->
-                    TopicItem(
-                        topic = topic,
-                        isFavorite = favoriteIds.contains(topic.id),
-                        onFavoriteToggle = { viewModel.toggleFavorite(topic.id) },
-                        onClick = { navController.navigate("resource_detail/${topic.id}") }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = dimensionResource(id = R.dimen.padding_20dp))
+        ) {
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
+
+                // These small boxes show how many favorites and notes the teacher has
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_12dp))
+                ) {
+                StatCard(
+                    count = favoritesCount,
+                    label = stringResource(id = R.string.favorites_label),
+                    icon = Icons.Default.Favorite,
+                    onClick = onLibraryClick,
+                    modifier = Modifier.weight(1f),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                StatCard(
+                    count = notesCount,
+                    label = stringResource(id = R.string.my_notes_label),
+                    icon = Icons.AutoMirrored.Filled.Note,
+                    onClick = onLibraryClick,
+                    modifier = Modifier.weight(1f),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
+            }
+
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
+                
+                Text(
+                    text = stringResource(id = R.string.quick_actions_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_12dp))
+                )
+                
+                // Buttons for Library, Schemes, and About
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+                    ) {
+                        ActionButton(
+                            text = stringResource(id = R.string.my_library),
+                            icon = Icons.AutoMirrored.Filled.LibraryBooks,
+                            onClick = onLibraryClick,
+                            modifier = Modifier.weight(1f)
+                        )
+                        ActionButton(
+                            text = stringResource(id = R.string.schemes_label),
+                            icon = Icons.Default.SettingsSuggest,
+                            onClick = onSchemeClick,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    ActionButton(
+                        text = stringResource(id = R.string.about_app_label),
+                        icon = Icons.Default.Info,
+                        onClick = onAboutClick,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
+
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_xlarge)))
+
+                // This list shows all the subjects the teacher can teach
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_12dp))
+                ) {
+                    items(items = subjects, key = { it.name }) { subject ->
+                        AnimatedVisibility(
+                            visible = showContent,
+                            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 4 })
+                        ) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = { onOpenTopics(subject.name) },
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small)),
+                                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
+                                border = BorderStroke(
+                                    width = dimensionResource(id = R.dimen.border_thin),
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(dimensionResource(id = R.dimen.padding_medium)),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = subject.name,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Icon(
+                                        imageVector = Icons.Default.ChevronRight,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)),
+                                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
+                        TextButton(
+                            onClick = onLogout,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+                            Spacer(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_xsmall)))
+                            Text(
+                                text = stringResource(id = R.string.logout_button),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
+                    }
+                }
+            }
+        }
+    }
+
+@Composable
+fun StatCard(
+    count: Int, 
+    label: String, 
+    icon: ImageVector, 
+    onClick: () -> Unit, 
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f),
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
+        color = containerColor,
+        border = null
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_12dp), vertical = dimensionResource(id = R.dimen.padding_10dp)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small)),
+                tint = contentColor
+            )
+            Column {
+                Text(
+                    text = count.toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = contentColor
+                )
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = contentColor.copy(alpha = 0.8f)
+                )
             }
         }
     }
 }
 
 @Composable
-fun TopicItem(
-    topic: Topic,
-    isFavorite: Boolean,
-    onFavoriteToggle: () -> Unit,
-    onClick: () -> Unit
+fun ActionButton(
+    text: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable(onClick = onClick)
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(dimensionResource(id = R.dimen.button_height_large)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
+        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        ),
+        elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small))
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = topic.title, style = MaterialTheme.typography.titleMedium)
-                Text(text = "${topic.subject} - ${topic.classLevel}", style = MaterialTheme.typography.bodySmall)
-            }
-            IconButton(onClick = onFavoriteToggle) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite",
-                    tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Icon(icon, contentDescription = null, modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
+            Text(
+                text = text, 
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold
+            )
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenPreview() {
+    CbcTeachersToolkitTheme {
+        HomeContent(
+            teacherName = "Ian",
+            favoritesCount = 3,
+            notesCount = 12,
+            subjects = listOf(
+                SubjectItem("Mathematics"),
+                SubjectItem("English"),
+                SubjectItem("Science"),
+                SubjectItem("Social Studies")
+            ),
+            onLibraryClick = {},
+            onAboutClick = {},
+            onSchemeClick = {},
+            onLogout = {},
+            onMenuClick = {},
+            onOpenTopics = {}
+        )
     }
 }

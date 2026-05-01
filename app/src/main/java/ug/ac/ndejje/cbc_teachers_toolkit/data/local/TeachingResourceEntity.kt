@@ -13,6 +13,7 @@ data class TeachingResourceEntity(
     val source: String = "NCDC",
     val localPath: String? = null,
     val isDownloaded: Boolean = false,
+    val isFavorite: Boolean = false,
     val fileSize: String? = null, // e.g. "4.2 MB"
     val version: Int = 1
 )

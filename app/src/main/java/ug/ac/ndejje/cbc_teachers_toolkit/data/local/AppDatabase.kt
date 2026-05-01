@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
+// This is our main database for the app using Room
 @Database(
     entities = [
         TopicEntity::class,

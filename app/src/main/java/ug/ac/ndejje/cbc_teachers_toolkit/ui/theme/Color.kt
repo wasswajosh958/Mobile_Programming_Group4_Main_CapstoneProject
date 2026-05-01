@@ -2,13 +2,13 @@ package ug.ac.ndejje.cbc_teachers_toolkit.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Light Theme Professional Palette (Deep Blue & Teal)
-val md_theme_light_primary = Color(0xFF005AC1) // Trustworthy Deep Blue
+// Our App Colors - Using blue and teal for a clean look
+val md_theme_light_primary = Color(0xFF005AC1) // Deep Blue
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
 val md_theme_light_primaryContainer = Color(0xFFD8E2FF)
 val md_theme_light_onPrimaryContainer = Color(0xFF001A41)
 
-val md_theme_light_secondary = Color(0xFF006A6A) // Professional Teal
+val md_theme_light_secondary = Color(0xFF006A6A) // Teal
 val md_theme_light_onSecondary = Color(0xFFFFFFFF)
 val md_theme_light_secondaryContainer = Color(0xFF6FF6F6)
 val md_theme_light_onSecondaryContainer = Color(0xFF002020)
@@ -27,7 +27,7 @@ val SuccessGreenContainer = Color(0xFFE8F5E9)
 val WarningOrange = Color(0xFFE65100)
 val WarningOrangeContainer = Color(0xFFFFF3E0)
 
-// Dark Theme Professional Palette (Deep Navy)
+// Dark Mode Colors
 val md_theme_dark_primary = Color(0xFFAEC6FF)
 val md_theme_dark_onPrimary = Color(0xFF002E69)
 val md_theme_dark_primaryContainer = Color(0xFF004494)
