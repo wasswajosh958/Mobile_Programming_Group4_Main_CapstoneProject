@@ -4,10 +4,9 @@ import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 
 object CbcSeedData {
+    // This list has all the files we put in the assets folder like PDFs and Videos
     val starterResources: List<TeachingResourceEntity> = listOf(
-        // --- ATTACHED LOCAL RESOURCES ONLY (All others removed as requested) ---
-        
-        // S.1 Physics: Mechanics and Energy (Topic 17)
+        // These are local files we saved in the app so they work without internet
         TeachingResourceEntity(
             key = "17|NOTES|local_force",
             topicId = 17,
@@ -198,8 +197,8 @@ object CbcSeedData {
         )
     )
 
+    // This list has all the topics for different subjects like Biology, Math, etc.
     val topics: List<TopicEntity> = listOf(
-        // --- SCIENCES ---
         buildTopic(1, "Biology", "S1", "Cells and Classification"),
         buildTopic(2, "Biology", "S2", "Human Body Systems"),
         buildTopic(3, "Biology", "S3", "Genetics and Evolution"),
@@ -252,6 +251,7 @@ object CbcSeedData {
         buildTopic(54, "Physical Education", "S1", "Athletics and Team Games")
     )
 
+    // This helper function makes it easy to add a new topic to our list
     private fun buildTopic(
         id: Int,
         subject: String,

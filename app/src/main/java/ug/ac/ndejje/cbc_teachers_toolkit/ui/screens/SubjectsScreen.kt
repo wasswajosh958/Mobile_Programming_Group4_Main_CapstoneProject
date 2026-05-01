@@ -1,11 +1,11 @@
 package ug.ac.ndejje.cbc_teachers_toolkit.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,16 +45,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
-import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectsUiState
 import ug.ac.ndejje.cbc_teachers_toolkit.R
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
-import androidx.compose.ui.unit.dp
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectsUiState
 
 @Composable
 fun SubjectsScreen(
@@ -107,35 +107,35 @@ fun SubjectsContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .clip(RoundedCornerShape(bottomStart = dimensionResource(id = R.dimen.header_corner_radius), bottomEnd = dimensionResource(id = R.dimen.header_corner_radius)))
                 .background(brush = headerGradient)
         ) {
             Column(
                 modifier = Modifier.padding(
-                    start = 12.dp,
-                    end = 20.dp,
-                    top = 16.dp,
-                    bottom = 32.dp
+                    start = dimensionResource(id = R.dimen.padding_12dp),
+                    end = dimensionResource(id = R.dimen.padding_20dp),
+                    top = dimensionResource(id = R.dimen.padding_medium),
+                    bottom = dimensionResource(id = R.dimen.header_corner_radius)
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onMenuClick) {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
+                            contentDescription = stringResource(id = R.string.menu),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
                     Column {
                         Text(
-                            text = "Browse Subjects",
+                            text = stringResource(id = R.string.browse_subjects),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = "Find resources for your classes",
+                            text = stringResource(id = R.string.subjects_screen_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -147,9 +147,9 @@ fun SubjectsContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.padding_20dp))
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
             // Search Bar
             OutlinedTextField(
@@ -158,7 +158,7 @@ fun SubjectsContent(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = stringResource(id = R.string.search_hint)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -166,33 +166,33 @@ fun SubjectsContent(
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
             // Filters Section
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
             ) {
                 Icon(
                     Icons.Default.FilterList,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small))
                 )
                 Text(
-                    text = "Filters",
+                    text = stringResource(id = R.string.filters_label),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 TextButton(onClick = onResetFilters) {
-                    Text("Clear All", style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(id = R.string.clear_all), style = MaterialTheme.typography.labelLarge)
                 }
             }
 
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
             ) {
                 item {
                     AssistChip(
@@ -217,7 +217,7 @@ fun SubjectsContent(
             }
 
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
             ) {
                 item {
                     AssistChip(
@@ -241,7 +241,7 @@ fun SubjectsContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
             AnimatedContent(
                 targetState = uiState.isLoading,
@@ -266,7 +266,7 @@ fun SubjectsContent(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_12dp))
                     ) {
                         items(
                             items = uiState.filteredTopics,
@@ -280,15 +280,15 @@ fun SubjectsContent(
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surface
                                 ),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(16.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small)),
+                                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                                 border = BorderStroke(
-                                    width = 1.dp,
+                                    width = dimensionResource(id = R.dimen.border_thin),
                                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                                 )
                             ) {
                                 Column(
-                                    modifier = Modifier.padding(16.dp)
+                                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium))
                                 ) {
                                     Text(
                                         text = topic.title,
@@ -296,19 +296,19 @@ fun SubjectsContent(
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
                                     )
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_xsmall)))
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                                     ) {
                                         Surface(
                                             color = MaterialTheme.colorScheme.secondaryContainer,
-                                            shape = RoundedCornerShape(8.dp)
+                                            shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_small))
                                         ) {
                                             Text(
                                                 text = topic.subject,
                                                 style = MaterialTheme.typography.labelSmall,
-                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small), vertical = dimensionResource(id = R.dimen.padding_xsmall)),
                                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                                             )
                                         }
@@ -327,7 +327,7 @@ fun SubjectsContent(
                             }
                         }
                         item {
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
                         }
                     }
                 }

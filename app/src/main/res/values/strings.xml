@@ -40,11 +40,11 @@
     <string name="expand_section">Expand section</string>
     <string name="collapse_section">Collapse section</string>
     <string name="about_title">How to Use CBC Toolkit</string>
-    <string name="about_subtitle">Your professional companion for the Ugandan CBC Curriculum.</string>
+    <string name="about_subtitle">The best app for teachers following the Ugandan CBC Curriculum.</string>
     <string name="about_description">The CBC Teachers Toolkit is designed to empower Ugandan teachers with offline-first tools for effective classroom delivery. It streamlines the transition to the New Lower Secondary Curriculum.</string>
     <string name="how_to_use_title">Key Functions &amp; Guide</string>
     <string name="how_to_use_1">1. <b>Browse &amp; Search:</b> Access a complete database of S1-S4 topics, lesson plans, and teaching tips.</string>
-    <string name="how_to_use_2">2. <b>Scheme Builder:</b> Create professional A4 landscape Schemes of Work. Save them offline or share as PDF.</string>
+    <string name="how_to_use_2">2. <b>Scheme Builder:</b> Create A4 landscape Schemes of Work. Save them offline or share as PDF.</string>
     <string name="how_to_use_3">3. <b>My Library:</b> Save your favorite topics and add personal teaching observations as notes.</string>
     <string name="how_to_use_4">4. <b>Offline Resources:</b> Download NCDC guides and videos to use them in the classroom without internet.</string>
     <string name="how_to_use_5">5. <b>Accessibility:</b> Use the \'Read Aloud\' feature to listen to lesson content while multi-tasking.</string>
@@ -107,5 +107,130 @@
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
     <string name="login_logo_short">CBC</string>
+    <string name="library_header_title">Teacher\'s Library</string>
+    <string name="library_resources_for">Resources for %1$s</string>
+    <string name="library_select_subject_hint">Select a subject to view books</string>
+    <string name="all_notes">All Notes</string>
+    <string name="curriculum_books_title">Curriculum Books &amp; Resources</string>
+    <string name="no_books_found">No books found for this subject.</string>
+    <string name="bookmarked_materials">Bookmarked Materials</string>
+    <string name="personal_notes_title">My Personal Notes</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="library_empty_state_text">No notes or books selected yet.</string>
+    <string name="menu">Menu</string>
     <string name="logout_button">Logout</string>
+    <string name="home_welcome">Welcome Teacher %1$s</string>
+    <string name="home_subtitle">What would you like to do today?</string>
+    <string name="favorites_label">Favorites</string>
+    <string name="my_notes_label">My Notes</string>
+    <string name="quick_actions_title">Quick Actions</string>
+    <string name="schemes_label">Schemes</string>
+    <string name="about_app_label">About the App</string>
+    <string name="app_version">Version 1.0.0</string>
+    <string name="about_summary">This application is designed to assist teachers in implementing the Competency Based Curriculum (CBC).</string>
+    <string name="my_subjects_title">My Subjects</string>
+    <string name="resource_detail_fallback_title">Resource Detail</string>
+    <string name="topic_not_found">Topic not found</string>
+    <string name="educational_materials_title">Educational Materials</string>
+    <string name="videos_label">Videos</string>
+    <string name="notes_label">Notes</string>
+    <string name="video_lessons_label">Video Lessons</string>
+    <string name="teaching_notes_label">Teaching Notes</string>
+    <string name="ncdc_pdf_guides_label">NCDC PDF Guides</string>
+    <string name="supplementary_label">Supplementary</string>
+    <string name="tools_title">Tools</string>
+    <string name="generate_scheme_button">Generate Scheme of Work</string>
+    <string name="my_teaching_notes_title">My Teaching Notes</string>
+    <string name="read_aloud_desc">Read Aloud</string>
+    <string name="share_desc">Share</string>
+    <string name="view_as_pdf_desc">View as PDF</string>
+    <string name="note_placeholder">Add your observations or adjustments for this topic...</string>
+    <string name="items_count_format">%1$d items</string>
+    <string name="school_name_label">School Name</string>
+    <string name="general_info_title">General Information</string>
+    <string name="topic_details_title">Topic Details</string>
+    <string name="competency_label">Competency / Theme</string>
+    <string name="date_label">Date</string>
+    <string name="update_scheme_button">Update Scheme</string>
+    <string name="cancel_editing_button">Cancel Editing</string>
+    <string name="edit_scheme_title">Edit Scheme</string>
+    <string name="delete_scheme_title">Delete Scheme</string>
+    <string name="delete_scheme_confirmation">Are you sure you want to delete this scheme for \'%1$s\'?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="view_pdf">View PDF</string>
+    <string name="edit">Edit</string>
+    <string name="subjects_screen_subtitle">Find resources for your classes</string>
+    <string name="filters_label">Filters</string>
+    <string name="clear_all">Clear All</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_subjects">Subjects</string>
+    <string name="nav_library">My Library</string>
+    <string name="nav_schemes">Schemes</string>
+    <string name="nav_about">About</string>
+    <string name="nav_admin">Admin Panel</string>
+    <string name="nav_teacher_label">Teacher: %1$s</string>
+    <string name="zero_dp_placeholder" translatable="false">0dp</string>
+    <string name="login_title_button">Login</string>
+    <string name="register_title_button">Register</string>
+    <string name="new_here">New here?</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="select_subjects_interest">Select your Subjects of Interest:</string>
+    <string name="sign_in">Sign In</string>
+
+    <!-- Admin Upload Screen -->
+    <string name="admin_panel_title">Admin Panel</string>
+    <string name="admin_management_title">Admin Management</string>
+    <string name="tab_upload">Upload</string>
+    <string name="tab_history">History</string>
+    <string name="select_subject">Select Subject</string>
+    <string name="select_class">Select Class</string>
+    <string name="select_topic">Select Topic</string>
+    <string name="resource_title">Resource Title</string>
+    <string name="resource_type">Resource Type</string>
+    <string name="external_url_label">External URL (GitHub Release, Archive.org, etc)</string>
+    <string name="file_size_label">File Size (e.g. 15MB, 1.2GB)</string>
+    <string name="file_size_placeholder">Helps teachers manage data</string>
+    <string name="select_file_phone">Select File from Phone</string>
+    <string name="selected_file_format">Selected: %1$s</string>
+    <string name="github_token_label">GitHub Access Token</string>
+    <string name="github_token_placeholder">Token is saved after first success</string>
+    <string name="error_fill_all_fields">Please fill all fields.</string>
+    <string name="error_provide_url">Please provide a URL.</string>
+    <string name="error_select_file">Please select a file to upload.</string>
+    <string name="status_uploading_file">Uploading file to GitHub...</string>
+    <string name="error_read_file">Failed to read local file.</string>
+    <string name="error_upload_failed">Upload Error: %1$s</string>
+    <string name="status_updating_index">Updating Resource Index...</string>
+    <string name="status_success">Success! Resource is now live.</string>
+    <string name="sync_to_github">Sync to GitHub</string>
+    <string name="no_history_yet">No upload history yet.</string>
+    <string name="upload_type_format">Type: %1$s</string>
+    <string name="upload_date_format">Date: %1$s</string>
+    <string name="status_live">LIVE</string>
+    <string name="error_generic_prefix">Error: %1$s</string>
+    <string name="error_credentials_required">Username and password are required.</string>
+    <string name="error_fullname_required">Full name is required for registration.</string>
+
+    <string-array name="available_subjects">
+        <item>English Language</item>
+        <item>Mathematics</item>
+        <item>Biology</item>
+        <item>Chemistry</item>
+        <item>Physics</item>
+        <item>Geography</item>
+        <item>History &amp; Political Education</item>
+        <item>Religious Education</item>
+        <item>Kiswahili</item>
+        <item>Agriculture</item>
+        <item>Entrepreneurship Education</item>
+        <item>Performing Arts</item>
+        <item>Art and Design</item>
+        <item>ICT</item>
+        <item>Nutrition &amp; Food Technology</item>
+        <item>Technology and Design</item>
+        <item>Physical Education</item>
+        <item>Local Language</item>
+        <item>Foreign Languages</item>
+    </string-array>
 </resources>

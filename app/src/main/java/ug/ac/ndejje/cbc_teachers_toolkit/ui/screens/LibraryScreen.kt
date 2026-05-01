@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
@@ -52,6 +51,9 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.OutlinedButton
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openUrl
+
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun LibraryScreen(
@@ -124,7 +126,7 @@ fun LibraryContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // --- Header Section ---
+        // Top part with the screen title
         val headerGradient = Brush.verticalGradient(
             colors = listOf(
                 MaterialTheme.colorScheme.primary,
@@ -135,35 +137,35 @@ fun LibraryContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .clip(RoundedCornerShape(bottomStart = dimensionResource(id = R.dimen.header_corner_radius), bottomEnd = dimensionResource(id = R.dimen.header_corner_radius)))
                 .background(brush = headerGradient)
         ) {
             Column(
                 modifier = Modifier.padding(
-                    start = 12.dp,
-                    end = 20.dp,
-                    top = 16.dp,
-                    bottom = 32.dp
+                    start = dimensionResource(id = R.dimen.padding_12dp),
+                    end = dimensionResource(id = R.dimen.padding_20dp),
+                    top = dimensionResource(id = R.dimen.padding_medium),
+                    bottom = dimensionResource(id = R.dimen.header_corner_radius)
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onMenuClick) {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
+                            contentDescription = stringResource(id = R.string.menu),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
                     Column {
                         Text(
-                            text = "Teacher's Library",
+                            text = stringResource(id = R.string.library_header_title),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = if (selectedSubject != null) "Resources for $selectedSubject" else "Select a subject to view books",
+                            text = if (selectedSubject != null) stringResource(id = R.string.library_resources_for, selectedSubject) else stringResource(id = R.string.library_select_subject_hint),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -175,30 +177,30 @@ fun LibraryContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.padding_20dp)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
         ) {
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+            item { Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium))) }
 
-            // --- Subject Selection Chips ---
+            // Buttons to pick a subject and filter the list
             item {
                 val subjects = allTopics.map { it.subject }.distinct().sorted()
                 Text(
-                    text = "Filter by Subject",
+                    text = stringResource(id = R.string.filter_subject),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 androidx.compose.foundation.lazy.LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
+                    modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small))
                 ) {
                     item {
                         androidx.compose.material3.FilterChip(
                             selected = selectedSubject == null,
                             onClick = { onSubjectSelect(null) },
-                            label = { Text("All Notes") },
-                            shape = RoundedCornerShape(12.dp)
+                            label = { Text(stringResource(id = R.string.all_notes)) },
+                            shape = RoundedCornerShape(dimensionResource(id = R.dimen.chip_corner_radius))
                         )
                     }
                     items(subjects) { subject ->
@@ -206,7 +208,7 @@ fun LibraryContent(
                             selected = selectedSubject == subject,
                             onClick = { onSubjectSelect(subject) },
                             label = { Text(subject) },
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(dimensionResource(id = R.dimen.chip_corner_radius))
                         )
                     }
                 }
@@ -215,7 +217,7 @@ fun LibraryContent(
             if (selectedSubject != null) {
                 item {
                     Text(
-                        text = "Curriculum Books & Resources",
+                        text = stringResource(id = R.string.curriculum_books_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -225,7 +227,7 @@ fun LibraryContent(
                 if (subjectTopics.isEmpty()) {
                     item {
                         Text(
-                            text = "No books found for this subject.",
+                            text = stringResource(id = R.string.no_books_found),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -235,22 +237,22 @@ fun LibraryContent(
                 items(subjectTopics) { topic ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small)),
                         onClick = { onTopicClick(topic.id) }
                     ) {
                         Row(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.MenuBook,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium))
                             )
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_medium)))
                             Column {
                                 Text(
                                     text = topic.title,
@@ -268,15 +270,15 @@ fun LibraryContent(
                 }
             }
 
-            // --- Favorite Resources (PDFs/Videos) ---
+            // Show materials that the teacher has bookmarked
             if (selectedSubject == null && favoriteResources.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Bookmarked Materials",
+                        text = stringResource(id = R.string.bookmarked_materials),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small))
                     )
                 }
 
@@ -289,7 +291,7 @@ fun LibraryContent(
                 }
             }
 
-            // --- Notes Section (Always visible or filtered) ---
+            // Show notes the teacher has written for different topics
             val filteredNotedTopics = if (selectedSubject != null) {
                 notedTopics.filter { it.subject == selectedSubject }
             } else {
@@ -299,24 +301,24 @@ fun LibraryContent(
             if (filteredNotedTopics.isNotEmpty()) {
                 item {
                     Text(
-                        text = "My Personal Notes",
+                        text = stringResource(id = R.string.personal_notes_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small))
                     )
                 }
 
                 items(filteredNotedTopics, key = { "note_${it.id}" }) { topic ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small).div(2)),
                         onClick = { onTopicClick(topic.id) }
                     ) {
                         Row(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
@@ -337,14 +339,14 @@ fun LibraryContent(
                                         text = "${topic.subject} • ${topic.classLevel}",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(top = 4.dp)
+                                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_xsmall))
                                     )
                                 }
                             }
                             IconButton(onClick = { onViewNote(topic, notes[topic.id].orEmpty()) }) {
                                 Icon(
                                     imageVector = Icons.Default.DownloadDone, // Changed to show it's exportable
-                                    contentDescription = "Export PDF",
+                                    contentDescription = stringResource(id = R.string.export_pdf),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -356,18 +358,18 @@ fun LibraryContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 48.dp),
+                            .padding(vertical = dimensionResource(id = R.dimen.padding_xxlarge)),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.MenuBook,
                             contentDescription = null,
-                            modifier = Modifier.size(64.dp),
+                            modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large)),
                             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
                         Text(
-                            text = "No notes or books selected yet.",
+                            text = stringResource(id = R.string.library_empty_state_text),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -375,7 +377,7 @@ fun LibraryContent(
                 }
             }
 
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item { Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large))) }
         }
     }
 }

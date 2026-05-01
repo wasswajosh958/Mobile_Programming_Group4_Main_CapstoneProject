@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,6 +34,10 @@ import android.provider.OpenableColumns
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.AuthViewModel
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectsUiState
+
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
+import ug.ac.ndejje.cbc_teachers_toolkit.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,6 +110,15 @@ fun AdminUploadScreen(
         }
     }
 
+    val errorFillFields = stringResource(R.string.error_fill_all_fields)
+    val errorProvideUrl = stringResource(R.string.error_provide_url)
+    val errorSelectFile = stringResource(R.string.error_select_file)
+    val statusUploadingFile = stringResource(R.string.status_uploading_file)
+    val errorReadFile = stringResource(R.string.error_read_file)
+    val errorUploadFailedPrefix = stringResource(R.string.error_upload_failed, "")
+    val statusUpdatingIndex = stringResource(R.string.status_updating_index)
+    val statusSuccess = stringResource(R.string.status_success)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -124,23 +136,28 @@ fun AdminUploadScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .clip(RoundedCornerShape(bottomStart = dimensionResource(R.dimen.header_corner_radius), bottomEnd = dimensionResource(R.dimen.header_corner_radius)))
                 .background(brush = headerGradient)
         ) {
             Column(
-                modifier = Modifier.padding(start = 12.dp, end = 20.dp, top = 16.dp, bottom = 32.dp)
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.padding_12dp),
+                    end = dimensionResource(R.dimen.padding_20dp),
+                    top = dimensionResource(R.dimen.padding_medium),
+                    bottom = dimensionResource(R.dimen.padding_xlarge)
+                )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onMenuClick) {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
+                            contentDescription = stringResource(R.string.menu),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_xsmall)))
                     Text(
-                        text = "Admin Panel",
+                        text = stringResource(R.string.admin_panel_title),
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.ExtraBold
@@ -150,21 +167,21 @@ fun AdminUploadScreen(
         }
 
         Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))
         ) {
             Text(
-                text = "Admin Management",
+                text = stringResource(R.string.admin_management_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
             TabRow(selectedTabIndex = selectedTab) {
                 Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }) {
-                    Text("Upload", modifier = Modifier.padding(16.dp))
+                    Text(stringResource(R.string.tab_upload), modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)))
                 }
                 Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }) {
-                    Text("History", modifier = Modifier.padding(16.dp))
+                    Text(stringResource(R.string.tab_history), modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)))
                 }
             }
 
@@ -202,15 +219,15 @@ fun AdminUploadScreen(
                     isUploading = isUploading,
                     onUpload = {
                         if (selectedTopic == null || title.isBlank() || githubToken.isBlank()) {
-                            statusMessage = "Please fill all fields."
+                            statusMessage = errorFillFields
                             return@UploadForm
                         }
                         if (type == "PDF_LINK" && url.isBlank()) {
-                            statusMessage = "Please provide a URL."
+                            statusMessage = errorProvideUrl
                             return@UploadForm
                         }
                         if (type != "PDF_LINK" && selectedFileUri == null) {
-                            statusMessage = "Please select a file to upload."
+                            statusMessage = errorSelectFile
                             return@UploadForm
                         }
 
@@ -222,10 +239,10 @@ fun AdminUploadScreen(
 
                                 // 1. Upload file if needed
                                 if (selectedFileUri != null) {
-                                    statusMessage = "Uploading file to GitHub..."
+                                    statusMessage = statusUploadingFile
                                     val bytes = context.contentResolver.openInputStream(selectedFileUri!!)?.use { it.readBytes() }
                                     if (bytes == null) {
-                                        statusMessage = "Failed to read local file."
+                                        statusMessage = errorReadFile
                                         isUploading = false
                                         return@launch
                                     }
@@ -238,14 +255,14 @@ fun AdminUploadScreen(
                                     if (uploadResult.isSuccess) {
                                         finalUrl = uploadResult.getOrThrow()
                                     } else {
-                                        statusMessage = "Upload Error: ${uploadResult.exceptionOrNull()?.message}"
+                                        statusMessage = context.getString(R.string.error_upload_failed, uploadResult.exceptionOrNull()?.message ?: "Unknown")
                                         isUploading = false
                                         return@launch
                                     }
                                 }
 
                                 // 2. Add to index
-                                statusMessage = "Updating Resource Index..."
+                                statusMessage = statusUpdatingIndex
                                 val result = githubManager.addResourceToGitHub(
                                     topicId = selectedTopic!!.id,
                                     title = title,
@@ -258,7 +275,7 @@ fun AdminUploadScreen(
                                     // Save token for future use
                                     authViewModel.saveGithubToken(githubToken)
                                     
-                                    statusMessage = "Success! Resource is now live."
+                                    statusMessage = statusSuccess
                                     
                                     // Save to history in DB
                                     viewModel.insertAdminUpload(AdminResourceEntity(
@@ -272,10 +289,10 @@ fun AdminUploadScreen(
 
                                     title = ""; url = ""; fileName = ""; selectedFileUri = null; fileSize = ""
                                 } else {
-                                    statusMessage = "Error: ${result.exceptionOrNull()?.message}"
+                                    statusMessage = context.getString(R.string.error_generic_prefix, result.exceptionOrNull()?.message ?: "Unknown")
                                 }
                             } catch (e: Exception) {
-                                statusMessage = "Error: ${e.message}"
+                                statusMessage = context.getString(R.string.error_generic_prefix, e.message ?: "Unknown")
                             } finally {
                                 isUploading = false
                             }
@@ -321,20 +338,20 @@ fun UploadForm(
     var topicExpanded by remember { mutableStateOf(false) }
     val types = listOf("PDF_LINK", "VIDEO", "PHOTO", "NOTES")
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_medium))) {
         // --- Subject Selection ---
         ExposedDropdownMenuBox(
             expanded = subjectExpanded,
             onExpandedChange = { subjectExpanded = it }
         ) {
             OutlinedTextField(
-                value = selectedSubject ?: "Select Subject",
+                value = selectedSubject ?: stringResource(R.string.select_subject),
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Subject") },
+                label = { Text(stringResource(R.string.subject_label)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = subjectExpanded) },
                 modifier = Modifier.menuAnchor().fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius))
             )
             ExposedDropdownMenu(
                 expanded = subjectExpanded,
@@ -358,13 +375,13 @@ fun UploadForm(
             onExpandedChange = { classExpanded = it }
         ) {
             OutlinedTextField(
-                value = selectedClass ?: "Select Class",
+                value = selectedClass ?: stringResource(R.string.select_class),
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Class Level") },
+                label = { Text(stringResource(R.string.class_level_label)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = classExpanded) },
                 modifier = Modifier.menuAnchor().fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius))
             )
             ExposedDropdownMenu(
                 expanded = classExpanded,
@@ -388,13 +405,13 @@ fun UploadForm(
             onExpandedChange = { topicExpanded = it }
         ) {
             OutlinedTextField(
-                value = selectedTopic?.title ?: "Select Topic",
+                value = selectedTopic?.title ?: stringResource(R.string.select_topic),
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Topic") },
+                label = { Text(stringResource(R.string.topic_title_label)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = topicExpanded) },
                 modifier = Modifier.menuAnchor().fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius)),
                 enabled = filteredTopics.isNotEmpty()
             )
             ExposedDropdownMenu(
@@ -416,15 +433,15 @@ fun UploadForm(
         OutlinedTextField(
             value = title,
             onValueChange = onTitleChange,
-            label = { Text("Resource Title") },
+            label = { Text(stringResource(R.string.resource_title)) },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius))
         )
 
-        Text(text = "Resource Type", style = MaterialTheme.typography.labelLarge)
+        Text(text = stringResource(R.string.resource_type), style = MaterialTheme.typography.labelLarge)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))
         ) {
             types.forEach { t ->
                 FilterChip(
@@ -439,34 +456,34 @@ fun UploadForm(
             OutlinedTextField(
                 value = url,
                 onValueChange = onUrlChange,
-                label = { Text("External URL (GitHub Release, Archive.org, etc)") },
+                label = { Text(stringResource(R.string.external_url_label)) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius))
             )
             
             OutlinedTextField(
                 value = fileSize,
                 onValueChange = onFileSizeChange,
-                label = { Text("File Size (e.g. 15MB, 1.2GB)") },
+                label = { Text(stringResource(R.string.file_size_label)) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                placeholder = { Text("Helps teachers manage data") }
+                shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius)),
+                placeholder = { Text(stringResource(R.string.file_size_placeholder)) }
             )
         } else {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onPickFile,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                border = BorderStroke(dimensionResource(R.dimen.border_thin), MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(32.dp))
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
                     Text(
-                        text = if (fileName.isBlank()) "Select File from Phone" else "Selected: $fileName",
+                        text = if (fileName.isBlank()) stringResource(R.string.select_file_phone) else stringResource(R.string.selected_file_format, fileName),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -477,33 +494,34 @@ fun UploadForm(
         OutlinedTextField(
             value = githubToken,
             onValueChange = onTokenChange,
-            label = { Text("GitHub Access Token") },
-            placeholder = { Text("Token is saved after first success") },
+            label = { Text(stringResource(R.string.github_token_label)) },
+            placeholder = { Text(stringResource(R.string.github_token_placeholder)) },
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius)),
             visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation()
         )
 
         if (statusMessage.isNotBlank()) {
+            val successMessage = stringResource(R.string.status_success)
             Text(
                 text = statusMessage,
-                color = if (statusMessage.contains("Success")) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                color = if (statusMessage == successMessage) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium
             )
         }
 
         Button(
             onClick = onUpload,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth().height(dimensionResource(R.dimen.button_height_medium)),
+            shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius)),
             enabled = !isUploading
         ) {
             if (isUploading) {
-                CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
+                CircularProgressIndicator(modifier = Modifier.size(dimensionResource(R.dimen.padding_large)), color = MaterialTheme.colorScheme.onPrimary)
             } else {
                 Icon(Icons.Default.CloudUpload, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Sync to GitHub")
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
+                Text(stringResource(R.string.sync_to_github))
             }
         }
     }
@@ -512,28 +530,28 @@ fun UploadForm(
 @Composable
 fun UploadHistory(uploads: List<AdminResourceEntity>) {
     if (uploads.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-            Text("No upload history yet.")
+        Box(modifier = Modifier.fillMaxSize().padding(dimensionResource(R.dimen.padding_xlarge)), contentAlignment = Alignment.Center) {
+            Text(stringResource(R.string.no_history_yet))
         }
     } else {
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_small))) {
             items(uploads) { upload ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.chip_corner_radius))
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(text = upload.title, fontWeight = FontWeight.Bold)
-                            Text(text = "Type: ${upload.type}", style = MaterialTheme.typography.bodySmall)
+                            Text(text = stringResource(R.string.upload_type_format, upload.type), style = MaterialTheme.typography.bodySmall)
                             val date = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date(upload.uploadDate))
-                            Text(text = "Date: $date", style = MaterialTheme.typography.bodySmall)
+                            Text(text = stringResource(R.string.upload_date_format, date), style = MaterialTheme.typography.bodySmall)
                         }
                         Text(
-                            text = "LIVE", 
+                            text = stringResource(R.string.status_live),
                             color = MaterialTheme.colorScheme.primary, 
                             fontWeight = FontWeight.Black,
                             style = MaterialTheme.typography.labelSmall

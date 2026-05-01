@@ -34,9 +34,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import ug.ac.ndejje.cbc_teachers_toolkit.R
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -54,7 +56,7 @@ import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.appViewModel
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.authViewModel
 
 data class NavigationItem(
-    val label: String,
+    val labelResId: Int,
     val route: String,
     val icon: ImageVector
 )
@@ -72,17 +74,19 @@ fun AppNavigation() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
+    // This list controls what shows up in our side menu
     val menuItems = buildList {
-        add(NavigationItem("Home", "home", Icons.Default.Home))
-        add(NavigationItem("Subjects", "subjects", Icons.AutoMirrored.Filled.ListAlt))
-        add(NavigationItem("My Library", "library", Icons.AutoMirrored.Filled.LibraryBooks))
-        add(NavigationItem("Schemes", "scheme", Icons.Default.SettingsSuggest))
-        add(NavigationItem("About", "about", Icons.Default.Info))
+        add(NavigationItem(R.string.nav_home, "home", Icons.Default.Home))
+        add(NavigationItem(R.string.nav_subjects, "subjects", Icons.AutoMirrored.Filled.ListAlt))
+        add(NavigationItem(R.string.nav_library, "library", Icons.AutoMirrored.Filled.LibraryBooks))
+        add(NavigationItem(R.string.nav_schemes, "scheme", Icons.Default.SettingsSuggest))
+        add(NavigationItem(R.string.nav_about, "about", Icons.Default.Info))
         if (currentUser?.isAdmin == true) {
-            add(NavigationItem("Admin Panel", "admin", Icons.Default.CloudUpload))
+            add(NavigationItem(R.string.nav_admin, "admin", Icons.Default.CloudUpload))
         }
     }
 
+    // This makes sure that if we are already logged in, we go straight to home
     LaunchedEffect(currentUser) {
         val currentRoute = navController.currentBackStackEntry?.destination?.route
         if (currentUser != null && currentRoute == "login") {
@@ -93,18 +97,18 @@ fun AppNavigation() {
         }
     }
 
-    // Determine if we should show the drawer and top bar
+    // We only show the menu on the main screens, not on splash or login
     val showNavigation = currentDestination?.route !in listOf("splash", "login", null)
-    val showTopBar = false // All screens now have custom headers
+    val showTopBar = false 
 
     if (showNavigation) {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
                 ModalDrawerSheet {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))) {
                         Text(
-                            text = "CBC Teachers' Toolkit",
+                            text = stringResource(R.string.app_name),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -112,7 +116,7 @@ fun AppNavigation() {
                         val user = currentUser
                         if (user != null) {
                             Text(
-                                text = "Teacher: ${user.fullName}",
+                                text = stringResource(R.string.nav_teacher_label, user.fullName),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -121,7 +125,7 @@ fun AppNavigation() {
                     HorizontalDivider()
                     menuItems.forEach { item ->
                         NavigationDrawerItem(
-                            label = { Text(item.label) },
+                            label = { Text(stringResource(item.labelResId)) },
                             icon = { Icon(item.icon, contentDescription = null) },
                             selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                             onClick = {
@@ -139,7 +143,7 @@ fun AppNavigation() {
                     }
                     HorizontalDivider()
                     NavigationDrawerItem(
-                        label = { Text("Logout") },
+                        label = { Text(stringResource(R.string.logout_button)) },
                         icon = { Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null) },
                         selected = false,
                         onClick = {
@@ -159,20 +163,20 @@ fun AppNavigation() {
                     if (showTopBar) {
                         TopAppBar(
                             title = {
-                                val title = when (currentDestination?.route) {
-                                    "home" -> "Home"
-                                    "subjects" -> "Subjects"
-                                    "library" -> "My Library"
-                                    "about" -> "About"
-                                    "scheme" -> "Scheme Builder"
-                                    "resource/{topicId}" -> "Resource Detail"
-                                    else -> "CBC Toolkit"
+                                val titleRes = when (currentDestination?.route) {
+                                    "home" -> R.string.nav_home
+                                    "subjects" -> R.string.nav_subjects
+                                    "library" -> R.string.nav_library
+                                    "about" -> R.string.nav_about
+                                    "scheme" -> R.string.open_scheme_builder
+                                    "resource/{topicId}" -> R.string.resource_detail_fallback_title
+                                    else -> R.string.app_name
                                 }
-                                Text(title)
+                                Text(stringResource(titleRes))
                             },
                             navigationIcon = {
                                 IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                    Icon(Icons.Default.Menu, contentDescription = "Menu")
+                                    Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.menu))
                                 }
                             },
                             colors = TopAppBarDefaults.topAppBarColors(
@@ -184,7 +188,7 @@ fun AppNavigation() {
                     }
                 }
             ) { innerPadding ->
-                val contentPadding = if (showTopBar) innerPadding else androidx.compose.foundation.layout.PaddingValues(0.dp)
+                val contentPadding = if (showTopBar) innerPadding else androidx.compose.foundation.layout.PaddingValues(dimensionResource(id = R.dimen.zero_dp))
                 Box(modifier = Modifier.padding(contentPadding)) {
                     NavContent(navController, viewModel, authVm, currentUser) {
                         scope.launch { drawerState.open() }
@@ -205,10 +209,7 @@ fun NavContent(
     currentUser: UserEntity?,
     onMenuClick: () -> Unit
 ) {
-    // Determine if we are still waiting for the first emission of currentUser
-    // If authVm.currentUser is a StateFlow, its initialValue is null, but we want to know if it's "loading"
-    // Since it's from a database, it should emit very quickly.
-    
+    // This is where we define all the screens in our app
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {
             SplashScreen(

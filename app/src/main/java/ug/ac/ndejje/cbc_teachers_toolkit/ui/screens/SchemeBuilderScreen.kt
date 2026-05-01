@@ -1,16 +1,11 @@
 package ug.ac.ndejje.cbc_teachers_toolkit.ui.screens
 
-import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
-import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SchemeDraftUiState
-import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SchemeSaveStatus
-import ug.ac.ndejje.cbc_teachers_toolkit.R
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,16 +23,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Share
-import ug.ac.ndejje.cbc_teachers_toolkit.util.TextToSpeechHelper
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,7 +45,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,26 +58,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import ug.ac.ndejje.cbc_teachers_toolkit.R
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.SchemeOfWorkEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.SuccessGreen
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.SuccessGreenContainer
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.WarningOrange
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.WarningOrangeContainer
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SchemeDraftUiState
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SchemeSaveStatus
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
+import ug.ac.ndejje.cbc_teachers_toolkit.util.TextToSpeechHelper
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openScheme
 import ug.ac.ndejje.cbc_teachers_toolkit.util.shareScheme
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 
 @Composable
 fun SchemeBuilderScreen(
@@ -145,8 +143,8 @@ fun SchemeBuilderContent(
     if (schemeToDelete != null) {
         AlertDialog(
             onDismissRequest = { schemeToDelete = null },
-            title = { Text("Delete Scheme") },
-            text = { Text("Are you sure you want to delete this scheme for '${schemeToDelete?.topicTitle}'?") },
+            title = { Text(stringResource(id = R.string.delete_scheme_title)) },
+            text = { Text(stringResource(id = R.string.delete_scheme_confirmation, schemeToDelete?.topicTitle ?: "")) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -154,12 +152,12 @@ fun SchemeBuilderContent(
                         schemeToDelete = null
                     }
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(id = R.string.delete), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { schemeToDelete = null }) {
-                    Text("Cancel")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )
@@ -181,35 +179,35 @@ fun SchemeBuilderContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .clip(RoundedCornerShape(bottomStart = dimensionResource(id = R.dimen.header_corner_radius), bottomEnd = dimensionResource(id = R.dimen.header_corner_radius)))
                 .background(brush = headerGradient)
         ) {
             Column(
                 modifier = Modifier.padding(
-                    start = 12.dp,
-                    end = 20.dp,
-                    top = 16.dp,
-                    bottom = 32.dp
+                    start = dimensionResource(id = R.dimen.padding_12dp),
+                    end = dimensionResource(id = R.dimen.padding_20dp),
+                    top = dimensionResource(id = R.dimen.padding_medium),
+                    bottom = dimensionResource(id = R.dimen.header_corner_radius)
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
                     Column {
                         Text(
-                            text = "Scheme Builder",
+                            text = stringResource(id = R.string.scheme_builder_title),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = "Generate and manage schemes of work",
+                            text = stringResource(id = R.string.scheme_builder_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -222,21 +220,21 @@ fun SchemeBuilderContent(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.padding_20dp))
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
             // --- Guide Toggle ---
             OutlinedButton(
                 onClick = { showGuide = !showGuide },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius))
             ) {
                 Icon(
                     imageVector = if (showGuide) Icons.Default.Info else Icons.AutoMirrored.Filled.HelpOutline,
                     contentDescription = null
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
                 Text(
                     text = if (showGuide) {
                         stringResource(id = R.string.hide_scheme_guide)
@@ -254,15 +252,15 @@ fun SchemeBuilderContent(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .padding(top = dimensionResource(id = R.dimen.padding_12dp)),
+                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                     ) {
                         Text(
                             text = stringResource(id = R.string.scheme_guide_title),
@@ -283,7 +281,7 @@ fun SchemeBuilderContent(
                                     text = "${index + 1}.",
                                     style = MaterialTheme.typography.bodyMedium,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.width(24.dp)
+                                    modifier = Modifier.width(dimensionResource(id = R.dimen.padding_large))
                                 )
                                 Text(
                                     text = stringResource(id = stepRes),
@@ -295,22 +293,22 @@ fun SchemeBuilderContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
             // --- Form Section ---
             SchemeSectionHeader(
-                title = if (isEditing) "Edit Scheme" else "General Information",
+                title = if (isEditing) stringResource(id = R.string.edit_scheme_title) else stringResource(id = R.string.general_info_title),
                 icon = if (isEditing) Icons.Default.Edit else Icons.Default.Info,
-                onSpeak = { onSpeak("General Information. Teacher: ${draft.teacherName}. School: ${draft.schoolName}. Subject: ${draft.subject}. Class: ${draft.classLevel}.") }
+                onSpeak = { onSpeak("${if (isEditing) "Edit Scheme" else "General Information"}. Teacher: ${draft.teacherName}. School: ${draft.schoolName}. Subject: ${draft.subject}. Class: ${draft.classLevel}.") }
             )
 
             if (isEditing) {
                 OutlinedButton(
                     onClick = onCancelEdit,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                    shape = RoundedCornerShape(16.dp)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = dimensionResource(id = R.dimen.padding_small)),
+                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius))
                 ) {
-                    Text("Cancel Editing")
+                    Text(stringResource(id = R.string.cancel_editing_button))
                 }
             }
 
@@ -323,10 +321,10 @@ fun SchemeBuilderContent(
             SchemeInputField(
                 value = draft.schoolName,
                 onValueChange = { value -> onUpdateDraft { it.copy(schoolName = value) } },
-                label = "School Name"
+                label = stringResource(id = R.string.school_name_label)
             )
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_12dp))) {
                 Box(modifier = Modifier.weight(1f)) {
                     SchemeInputField(
                         value = draft.subject,
@@ -343,7 +341,7 @@ fun SchemeBuilderContent(
                 }
             }
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_12dp))) {
                 Box(modifier = Modifier.weight(1f)) {
                     SchemeInputField(
                         value = draft.term,
@@ -363,12 +361,12 @@ fun SchemeBuilderContent(
             SchemeInputField(
                 value = draft.date,
                 onValueChange = { value -> onUpdateDraft { it.copy(date = value) } },
-                label = "Date"
+                label = stringResource(id = R.string.date_label)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
             SchemeSectionHeader(
-                title = "Topic Details",
+                title = stringResource(id = R.string.topic_details_title),
                 icon = Icons.Default.Add,
                 onSpeak = { onSpeak("Topic Details. Topic: ${draft.topicTitle}. Competency: ${draft.competency}. Objectives: ${draft.objectives}. Activities: ${draft.activities}. Resources: ${draft.resources}. Assessment: ${draft.assessment}.") }
             )
@@ -381,7 +379,7 @@ fun SchemeBuilderContent(
             SchemeInputField(
                 value = draft.competency,
                 onValueChange = { value -> onUpdateDraft { it.copy(competency = value) } },
-                label = "Competency / Theme",
+                label = stringResource(id = R.string.competency_label),
                 singleLine = false
             )
             SchemeInputField(
@@ -409,18 +407,18 @@ fun SchemeBuilderContent(
                 singleLine = false
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_12dp)))
 
             // --- Save Button ---
             Button(
                 onClick = onSaveScheme,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(16.dp)
+                    .height(dimensionResource(id = R.dimen.login_logo_size)),
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius))
             ) {
                 Text(
-                    text = if (isEditing) "Update Scheme" else stringResource(id = R.string.save_scheme_button),
+                    text = if (isEditing) stringResource(id = R.string.update_scheme_button) else stringResource(id = R.string.save_scheme_button),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -434,15 +432,15 @@ fun SchemeBuilderContent(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 12.dp),
-                    shape = RoundedCornerShape(12.dp),
+                        .padding(top = dimensionResource(id = R.dimen.padding_12dp)),
+                    shape = RoundedCornerShape(dimensionResource(id = R.dimen.chip_corner_radius)),
                     colors = CardDefaults.cardColors(
                         containerColor = if (saveStatus == SchemeSaveStatus.SUCCESS)
                             SuccessGreenContainer else WarningOrangeContainer
                     )
                 ) {
                     Row(
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_12dp)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
@@ -452,7 +450,7 @@ fun SchemeBuilderContent(
                             tint = if (saveStatus == SchemeSaveStatus.SUCCESS)
                                 SuccessGreen else WarningOrange
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small)))
                         Text(
                             text = when (saveStatus) {
                                 SchemeSaveStatus.SUCCESS -> stringResource(id = R.string.scheme_saved_message)
@@ -465,13 +463,13 @@ fun SchemeBuilderContent(
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(onClick = onClearStatus) {
-                            Icon(Icons.Default.Add, contentDescription = "Clear", modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Add, contentDescription = stringResource(id = R.string.menu), modifier = Modifier.size(dimensionResource(id = R.dimen.padding_medium)))
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_xlarge)))
 
             // --- History Section ---
             if (schemes.isNotEmpty()) {
@@ -481,20 +479,20 @@ fun SchemeBuilderContent(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        shape = RoundedCornerShape(16.dp),
+                            .padding(vertical = dimensionResource(id = R.dimen.padding_xsmall).plus(dimensionResource(id = R.dimen.padding_12dp).div(12))), // approximate 6dp
+                        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
                         ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small)),
                         border = BorderStroke(
-                            width = 1.dp,
+                            width = dimensionResource(id = R.dimen.border_thin),
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                         )
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)),
+                            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Column(modifier = Modifier.weight(1f)) {
@@ -518,28 +516,28 @@ fun SchemeBuilderContent(
                                 IconButton(onClick = { onEditScheme(scheme) }) {
                                     Icon(
                                         imageVector = Icons.Default.Edit,
-                                        contentDescription = "Edit",
+                                        contentDescription = stringResource(id = R.string.edit),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                                 IconButton(onClick = { openScheme(context, scheme) }) {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Filled.MenuBook,
-                                        contentDescription = "View PDF",
+                                        contentDescription = stringResource(id = R.string.view_pdf),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                                 IconButton(onClick = { shareScheme(context, scheme) }) {
                                     Icon(
                                         imageVector = Icons.Default.Share,
-                                        contentDescription = "Share",
+                                        contentDescription = stringResource(id = R.string.share_desc),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                                 IconButton(onClick = { schemeToDelete = scheme }) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
-                                        contentDescription = "Delete",
+                                        contentDescription = stringResource(id = R.string.delete),
                                         tint = MaterialTheme.colorScheme.error
                                     )
                                 }
@@ -547,12 +545,12 @@ fun SchemeBuilderContent(
                             
                             Surface(
                                 color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_small))
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.scheme_teacher_format, scheme.teacherName),
                                     style = MaterialTheme.typography.labelMedium,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_small), vertical = dimensionResource(id = R.dimen.padding_xsmall)),
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
@@ -561,17 +559,17 @@ fun SchemeBuilderContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
             
             OutlinedButton(
                 onClick = onBackClick,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius))
             ) {
                 Text(text = stringResource(id = R.string.back))
             }
             
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_xxlarge).minus(dimensionResource(id = R.dimen.padding_small))))
         }
     }
 }
@@ -584,10 +582,10 @@ fun SchemeSectionHeader(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(bottom = 12.dp)
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
+        modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_12dp))
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small)))
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
@@ -598,9 +596,9 @@ fun SchemeSectionHeader(
         IconButton(onClick = onSpeak) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                contentDescription = "Read Aloud",
+                contentDescription = stringResource(id = R.string.read_aloud_desc),
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small))
             )
         }
     }
@@ -618,9 +616,9 @@ fun SchemeInputField(
         onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = dimensionResource(id = R.dimen.padding_xsmall).plus(dimensionResource(id = R.dimen.padding_12dp).div(12))), // approximate 6dp
         label = { Text(text = label) },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
         singleLine = singleLine,
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,

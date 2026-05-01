@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import ug.ac.ndejje.cbc_teachers_toolkit.data.remote.FirebaseSyncManager
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 
+// This class handles all the data for topics, favorites, and resources
 class TopicRepository(
     private val context: Context,
     private val topicDao: TopicDao,
@@ -41,6 +42,7 @@ class TopicRepository(
         }
     }
 
+    // This function adds the starting data to the database if it's empty
     suspend fun seedIfEmpty() {
         if (topicDao.countTopics() == 0) {
             topicDao.insertAll(CbcSeedData.topics)
@@ -56,6 +58,7 @@ class TopicRepository(
         }
     }
 
+    // Get the resources from the assets folder json file
     private fun loadStarterResourcesFromAssets(): List<TeachingResourceEntity> {
         return try {
             val jsonString = context.assets.open("starter_resources.json").bufferedReader().use { it.readText() }
@@ -159,6 +162,7 @@ class TopicRepository(
         topicDao.updateResourceDownloadStatus(key, path)
     }
 
+    // Mark a topic as favorite or remove it from favorites
     suspend fun toggleFavorite(topicId: Int) {
         topicDao.toggleFavorite(topicId)
     }
@@ -171,6 +175,7 @@ class TopicRepository(
         return topicDao.observeFavoriteResources()
     }
 
+    // Save a teacher's note for a specific topic
     suspend fun saveNote(topicId: Int, note: String) {
         if (note.isBlank()) {
             topicDao.deleteNote(topicId)

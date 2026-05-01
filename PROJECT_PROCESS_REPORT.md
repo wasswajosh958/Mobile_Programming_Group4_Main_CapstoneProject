@@ -5,10 +5,11 @@
 This project was built to solve a practical challenge in the Ndejje University community context: student-teachers and teachers need fast, reliable, and curriculum-aligned teaching support that works in low-connectivity environments.
 
 The application targets CBC teaching support by offering:
-- Offline topic resources
-- Notes and favorites
+- Strictly Offline-First bundled resources (PDFs/Videos)
+- Resource-level favorites management
+- Notes and topic favorites
 - Scheme of Work builder
-- Optional online updates from official sources (NCDC links)
+- External system viewer integration for all media types
 
 Why this step was necessary:
 - The capstone requires a real community-relevant problem, not a generic demo.
@@ -26,9 +27,10 @@ The implementation was aligned with the capstone brief:
 - MainActivity as entry point only
 
 Scope decisions:
-- Keep app offline-first
-- Use copyright-safe linking to NCDC resources instead of bundling copied PDFs
-- Add an update button for when internet is available
+- Enforce strictly offline-first architecture by disabling remote sync (GitHub/Firebase).
+- Bundle all resources in `assets/Resources/` for guaranteed access.
+- Use system `Intent.ACTION_VIEW` for media (PDF/Video) instead of internal players to reduce technical debt.
+- Implement resource-level bookmarking (`isFavorite`) in `TeachingResourceEntity`.
 
 Why this step was necessary:
 - It ensured grading rubric compliance and prevented scope drift under tight deadlines.
@@ -45,7 +47,7 @@ Key entities:
 - TopicEntity
 - FavoriteEntity
 - NoteEntity
-- TeachingResourceEntity
+- TeachingResourceEntity (with `isFavorite` status)
 - SchemeOfWorkEntity
 
 Why this step was necessary
@@ -68,26 +70,36 @@ Why this step was necessary
 - Navigation Compose provides a clear user flow and satisfies the "3+ screens" requirement.
 - Dedicated screens keep each feature focused and easier to present.
 
-5. Offline-First Data Strategy
+5. Offline-First Data and Media Strategy
 
-Initial content is seeded locally for immediate offline use.
-Teacher actions (notes, favorites, schemes) are saved to Room.
+The app utilizes a strictly offline approach. All media (PDFs, Videos) are bundled within the APK assets.
+- Data seeding: Initial content is seeded locally via Room.
+- Asset Lifecycle: Resources are copied from `assets/Resources/` to the app's cache directory and opened via `FileProvider` when requested.
+- Remote synchronization features (SyncWorker) are disabled to prevent reliance on external connectivity.
 
 Why this step was necessary
-- Teachers may lose connectivity; core usage must continue offline.
-- Local persistence improves speed and reliability.
+- Ensures teachers in zero-connectivity areas have immediate access to all materials.
+- Simplifies app maintenance by removing network dependency.
 
-6. Online Update Strategy (Legal + Practical)
+6. External Media Integration
 
-Instead of embedding copyrighted source content:
-- The app syncs metadata and links from resource_index.json
-- It also generates companion links for video lessons and notes searches
+To provide a robust viewing experience without increasing app complexity:
+- Internal PDF and Video players were removed.
+- All media is opened via `DownloadUtils.openDownloadedFile` which triggers a system `Intent.ACTION_VIEW`.
+- This leverages high-quality external viewers already installed on the user's device.
 
 Why this step was necessary:
-- Respects copyright and source ownership
-- Still provides timely access to updated official guidance
+- Reduces technical debt and app size.
+- Guarantees compatibility with various media formats.
 
-7. Scheme of Work Module
+7. Resource-Level Favoriting
+
+A new favorite system allows users to bookmark specific PDFs and videos independently of topics.
+- Updated `TopicDao` to support resource favorite toggling.
+- Added a "Bookmarked Materials" section in the Library screen.
+
+Why this step was necessary:
+- Provides more granular control for teachers to organize their most-used files.
 
 A dedicated builder allows:
 - Week-based planning
@@ -100,16 +112,11 @@ Why this step was necessary:
 - This directly answers teacher workflow needs beyond content viewing
 - Converts app value from reader to teaching productivity tool
 
-8. UI/UX and Animation Decisions
+8. UI/UX and Navigation Prioritization
 
-Added
-- Splash transition animation
-- Animated visibility and content transitions
-- Collapsible detail sections
-
-Why this step was necessary:
-- Improves user engagement and readability
-- Demonstrates modern Compose UI capability as expected in capstone quality standards
+- The "About" section was moved to the bottom of the Home screen and side drawer, acting as a secondary utility.
+- Primary actions like "Library" and "Scheme Builder" are prioritized in the UI.
+- Bookmark icons were added to resource rows in the Detail screen.
 
 9. Code Quality and MainActivity Compliance
 
@@ -154,12 +161,12 @@ Why this step was necessary:
 12. Final Functional Summary
 
 The app now supports the following
-- Full offline usage of seeded CBC topics
-- Notes and favorites persistence
-- Online resource sync + offline reuse
-- Resource detail with links/videos/notes access
-- Scheme of Work creation, storage, and sharing
-- Animated and structured Compose interface
+- Strictly offline usage of bundled CBC topics and media.
+- Granular favoriting for both topics and individual resources.
+- External system viewing for all PDFs and Videos.
+- Notes persistence and scheme builder.
+- Scheme of Work creation, storage, and sharing.
+- Optimized and prioritized navigation flow.
 
 13. Suggested Future Enhancements
 

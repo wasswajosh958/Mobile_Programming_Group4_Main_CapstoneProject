@@ -47,7 +47,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.FilterChip
@@ -55,6 +54,7 @@ import androidx.compose.material3.FilterChipDefaults
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.AuthViewModel
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.AuthUiState
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.AuthMode
+import androidx.compose.ui.platform.LocalContext
 import ug.ac.ndejje.cbc_teachers_toolkit.R
 
 import androidx.compose.foundation.rememberScrollState
@@ -64,13 +64,19 @@ import androidx.compose.foundation.verticalScroll
 @Composable
 fun LoginScreen(authViewModel: AuthViewModel) {
     val state by authViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    val availableSubjects = remember {
+        context.resources.getStringArray(R.array.available_subjects).toList()
+    }
+
     LoginScreenContent(
         state = state,
+        availableSubjects = availableSubjects,
         onFullNameChanged = authViewModel::updateFullName,
         onUsernameChanged = authViewModel::updateUsername,
         onPasswordChanged = authViewModel::updatePassword,
         onToggleSubject = authViewModel::toggleSubject,
-        onSubmit = { authViewModel.authenticate() },
+        onSubmit = { authViewModel.authenticate(context) },
         onSwitchMode = {
             authViewModel.switchMode(
                 if (state.mode == AuthMode.LOGIN) AuthMode.REGISTER else AuthMode.LOGIN
@@ -83,6 +89,7 @@ fun LoginScreen(authViewModel: AuthViewModel) {
 @Composable
 private fun LoginScreenContent(
     state: AuthUiState,
+    availableSubjects: List<String>,
     onFullNameChanged: (String) -> Unit,
     onUsernameChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
@@ -90,13 +97,6 @@ private fun LoginScreenContent(
     onSubmit: () -> Unit,
     onSwitchMode: () -> Unit
 ) {
-    val availableSubjects = listOf(
-        "English Language", "Mathematics", "Biology", "Chemistry", "Physics",
-        "Geography", "History & Political Education", "Religious Education",
-        "Kiswahili", "Agriculture", "Entrepreneurship Education", "Performing Arts",
-        "Art and Design", "ICT", "Nutrition & Food Technology", "Technology and Design",
-        "Physical Education", "Local Language", "Foreign Languages"
-    )
     var showPassword by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
@@ -106,7 +106,7 @@ private fun LoginScreenContent(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        // Background Decorative Element
+        // This adds a light blue shade at the top of the login screen
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -124,13 +124,13 @@ private fun LoginScreenContent(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(24.dp),
+                .padding(dimensionResource(id = R.dimen.padding_large)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo / Header Section
+            // This is the round logo icon with "CBC" text
             Surface(
-                modifier = Modifier.size(80.dp),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_large) + dimensionResource(id = R.dimen.padding_medium)),
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary
             ) {
@@ -144,7 +144,7 @@ private fun LoginScreenContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
             Text(
                 text = stringResource(id = R.string.app_name),
@@ -159,43 +159,44 @@ private fun LoginScreenContent(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_xlarge)))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_large)),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation))
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_large)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
                 ) {
                     Text(
-                        text = if (state.mode == AuthMode.LOGIN) "Sign In" else "Create Account",
+                        text = if (state.mode == AuthMode.LOGIN) stringResource(id = R.string.sign_in) else stringResource(id = R.string.register_button),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
 
+                    // If the teacher is registering, we show the name field and subject chips
                     if (state.mode == AuthMode.REGISTER) {
                         OutlinedTextField(
                             value = state.fullName,
                             onValueChange = onFullNameChanged,
                             modifier = Modifier.fillMaxWidth(),
-                            label = { Text("Full Name") },
-                            shape = RoundedCornerShape(12.dp)
+                            label = { Text(stringResource(id = R.string.full_name_label)) },
+                            shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_12dp))
                         )
 
                         Text(
-                            text = "Select your Subjects of Interest:",
+                            text = stringResource(id = R.string.select_subjects_interest),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(top = 8.dp)
+                            modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_small))
                         )
 
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                         ) {
                             availableSubjects.forEach { subject ->
                                 FilterChip(
@@ -215,16 +216,16 @@ private fun LoginScreenContent(
                         value = state.username,
                         onValueChange = onUsernameChanged,
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Username") },
-                        shape = RoundedCornerShape(12.dp)
+                        label = { Text(stringResource(id = R.string.username_label)) },
+                        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_12dp))
                     )
 
                     OutlinedTextField(
                         value = state.password,
                         onValueChange = onPasswordChanged,
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Password") },
-                        shape = RoundedCornerShape(12.dp),
+                        label = { Text(stringResource(id = R.string.password_label)) },
+                        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_12dp)),
                         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                         trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
@@ -236,6 +237,7 @@ private fun LoginScreenContent(
                         }
                     )
 
+                    // This text shows error messages if login fails
                     if (state.message.isNotBlank()) {
                         Text(
                             text = state.message,
@@ -245,18 +247,18 @@ private fun LoginScreenContent(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
 
                     Button(
                         onClick = onSubmit,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
+                            .height(dimensionResource(id = R.dimen.login_logo_size)),
+                        shape = RoundedCornerShape(dimensionResource(id = R.dimen.padding_12dp)),
                         enabled = !state.isBusy
                     ) {
                         Text(
-                            text = if (state.mode == AuthMode.LOGIN) "Login" else "Register",
+                            text = if (state.mode == AuthMode.LOGIN) stringResource(id = R.string.login_title_button) else stringResource(id = R.string.register_title_button),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -268,12 +270,12 @@ private fun LoginScreenContent(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = if (state.mode == AuthMode.LOGIN) "New here?" else "Already have an account?",
+                            text = if (state.mode == AuthMode.LOGIN) stringResource(id = R.string.new_here) else stringResource(id = R.string.already_have_account),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         androidx.compose.material3.TextButton(onClick = onSwitchMode) {
                             Text(
-                                text = if (state.mode == AuthMode.LOGIN) "Register" else "Login",
+                                text = if (state.mode == AuthMode.LOGIN) stringResource(id = R.string.register_title_button) else stringResource(id = R.string.login_title_button),
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -295,6 +297,7 @@ private fun LoginScreenPreview() {
                 username = "ian_teacher",
                 message = ""
             ),
+            availableSubjects = listOf("English", "Math"),
             onFullNameChanged = {},
             onUsernameChanged = {},
             onPasswordChanged = {},
@@ -316,6 +319,7 @@ private fun RegisterScreenPreview() {
                 username = "ian_teacher",
                 message = "Passwords do not match"
             ),
+            availableSubjects = listOf("English", "Math"),
             onFullNameChanged = {},
             onUsernameChanged = {},
             onPasswordChanged = {},

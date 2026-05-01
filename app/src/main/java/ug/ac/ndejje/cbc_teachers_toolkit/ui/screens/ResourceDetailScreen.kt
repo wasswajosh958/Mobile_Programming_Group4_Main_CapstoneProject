@@ -1,10 +1,9 @@
 package ug.ac.ndejje.cbc_teachers_toolkit.ui.screens
 
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.foundation.clickable
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,13 +20,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,25 +57,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
+import ug.ac.ndejje.cbc_teachers_toolkit.R
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
-import androidx.compose.material.icons.filled.PictureAsPdf
-import androidx.compose.material.icons.filled.Share
+import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
+import ug.ac.ndejje.cbc_teachers_toolkit.util.TextToSpeechHelper
+import ug.ac.ndejje.cbc_teachers_toolkit.util.openDownloadedFile
 import ug.ac.ndejje.cbc_teachers_toolkit.util.openNotesAsPdf
 import ug.ac.ndejje.cbc_teachers_toolkit.util.shareNotes
-import ug.ac.ndejje.cbc_teachers_toolkit.util.openDownloadedFile
-import ug.ac.ndejje.cbc_teachers_toolkit.util.openUrl
-import ug.ac.ndejje.cbc_teachers_toolkit.util.TextToSpeechHelper
-import ug.ac.ndejje.cbc_teachers_toolkit.ui.viewmodel.SubjectViewModel
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun ResourceDetailScreen(
@@ -151,8 +152,6 @@ fun ResourceDetailContent(
     var showAssessment by rememberSaveable(topic?.id) { mutableStateOf(false) }
     var showTeachingTips by rememberSaveable(topic?.id) { mutableStateOf(false) }
 
-    val context = LocalContext.current
-
     LaunchedEffect(persistedNote) {
         noteDraft = persistedNote
     }
@@ -169,7 +168,7 @@ fun ResourceDetailContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // --- Header Section ---
+        // This is the top part of the screen with the topic title and back button
         val headerGradient = Brush.verticalGradient(
             colors = listOf(
                 MaterialTheme.colorScheme.primary,
@@ -180,29 +179,29 @@ fun ResourceDetailContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .clip(RoundedCornerShape(bottomStart = dimensionResource(id = R.dimen.header_corner_radius), bottomEnd = dimensionResource(id = R.dimen.header_corner_radius)))
                 .background(brush = headerGradient)
         ) {
             Column(
                 modifier = Modifier.padding(
-                    start = 12.dp,
-                    end = 20.dp,
-                    top = 16.dp,
-                    bottom = 32.dp
+                    start = dimensionResource(id = R.dimen.padding_12dp),
+                    end = dimensionResource(id = R.dimen.padding_20dp),
+                    top = dimensionResource(id = R.dimen.padding_medium),
+                    bottom = dimensionResource(id = R.dimen.header_corner_radius)
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(id = R.string.back),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
                     Column {
                         Text(
-                            text = topic?.title ?: "Resource Detail",
+                            text = topic?.title ?: stringResource(id = R.string.resource_detail_fallback_title),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
@@ -217,7 +216,7 @@ fun ResourceDetailContent(
                     IconButton(onClick = onToggleFavorite) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                            contentDescription = "Favorite",
+                            contentDescription = stringResource(id = R.string.favorite),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
@@ -227,7 +226,7 @@ fun ResourceDetailContent(
 
         if (topic == null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Topic not found", style = MaterialTheme.typography.bodyLarge)
+                Text(text = stringResource(id = R.string.topic_not_found), style = MaterialTheme.typography.bodyLarge)
             }
             return@Column
         }
@@ -236,23 +235,22 @@ fun ResourceDetailContent(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.padding_20dp))
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
-            // --- Official Resources Section ---
+            // This part shows links to PDFs and Videos for this topic
             if (downloadedResources.isNotEmpty()) {
-                SectionHeader(title = "Educational Materials", icon = Icons.Default.Folder)
+                SectionHeader(title = stringResource(id = R.string.educational_materials_title), icon = Icons.Default.Folder)
 
                 val grouped = downloadedResources.groupBy { it.type }
                 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small).plus(dimensionResource(id = R.dimen.padding_xsmall)))) {
                     // Video Folder
                     ResourceFolder(
-                        title = "Videos",
+                        title = stringResource(id = R.string.videos_label),
                         count = grouped["VIDEO"]?.size ?: 0,
                         icon = Icons.Default.PlayCircle,
                         color = MaterialTheme.colorScheme.primaryContainer,
@@ -261,7 +259,7 @@ fun ResourceDetailContent(
                     
                     // Notes Folder
                     ResourceFolder(
-                        title = "Notes",
+                        title = stringResource(id = R.string.notes_label),
                         count = (grouped["NOTES"]?.size ?: 0) + (grouped["PDF_LINK"]?.size ?: 0),
                         icon = Icons.Default.Description,
                         color = MaterialTheme.colorScheme.secondaryContainer,
@@ -269,21 +267,21 @@ fun ResourceDetailContent(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
                 grouped.forEach { (type, resourcesForType) ->
                     val typeLabel = when(type) {
-                        "VIDEO" -> "Video Lessons"
-                        "NOTES" -> "Teaching Notes"
-                        "PDF_LINK" -> "NCDC PDF Guides"
-                        else -> "Supplementary"
+                        "VIDEO" -> stringResource(id = R.string.video_lessons_label)
+                        "NOTES" -> stringResource(id = R.string.teaching_notes_label)
+                        "PDF_LINK" -> stringResource(id = R.string.ncdc_pdf_guides_label)
+                        else -> stringResource(id = R.string.supplementary_label)
                     }
                     
                     Text(
                         text = typeLabel,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = dimensionResource(id = R.dimen.padding_small))
                     )
 
                     resourcesForType.forEach { resource ->
@@ -293,15 +291,15 @@ fun ResourceDetailContent(
                             onToggleFavorite = { onToggleResourceFavorite(resource.key) }
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small)))
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
-            // --- Collapsible Sections ---
+            // These are the sections like Lesson Plan and Project Ideas that can open and close
             ExpandableSection(
-                title = "Lesson Plan",
+                title = stringResource(id = R.string.lesson_plan),
                 content = topic.lessonPlan,
                 expanded = showLessonPlan,
                 onToggle = { showLessonPlan = !showLessonPlan },
@@ -309,7 +307,7 @@ fun ResourceDetailContent(
             )
 
             ExpandableSection(
-                title = "Project Ideas",
+                title = stringResource(id = R.string.project_ideas),
                 content = topic.projectIdeas,
                 expanded = showProjectIdeas,
                 onToggle = { showProjectIdeas = !showProjectIdeas },
@@ -317,7 +315,7 @@ fun ResourceDetailContent(
             )
 
             ExpandableSection(
-                title = "Assessment Rubric",
+                title = stringResource(id = R.string.assessment_rubric),
                 content = topic.assessmentRubric,
                 expanded = showAssessment,
                 onToggle = { showAssessment = !showAssessment },
@@ -325,40 +323,40 @@ fun ResourceDetailContent(
             )
 
             ExpandableSection(
-                title = "Teaching Tips",
+                title = stringResource(id = R.string.teaching_tips),
                 content = topic.teachingTips,
                 expanded = showTeachingTips,
                 onToggle = { showTeachingTips = !showTeachingTips },
                 onSpeak = { onSpeak(topic.teachingTips) }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
             // --- Quick Actions ---
-            SectionHeader(title = "Tools", icon = Icons.Default.Save)
+            SectionHeader(title = stringResource(id = R.string.tools_title), icon = Icons.Default.Save)
             
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onOpenScheme,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.chip_corner_radius)),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             ) {
-                Text("Generate Scheme of Work")
+                Text(stringResource(id = R.string.generate_scheme_button))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium)))
 
-            // --- My Notes ---
+            // This area allows teachers to write and save their own notes
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "My Teaching Notes",
+                    text = stringResource(id = R.string.my_teaching_notes_title),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -368,21 +366,21 @@ fun ResourceDetailContent(
                         IconButton(onClick = { onSpeak(noteDraft) }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.VolumeUp,
-                                contentDescription = "Read Aloud",
+                                contentDescription = stringResource(id = R.string.read_aloud_desc),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
                         IconButton(onClick = { onShareNote(noteDraft) }) {
                             Icon(
                                 Icons.Default.Share,
-                                contentDescription = "Share",
+                                contentDescription = stringResource(id = R.string.share_desc),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
                         IconButton(onClick = { onViewNote(noteDraft) }) {
                             Icon(
                                 Icons.Default.PictureAsPdf,
-                                contentDescription = "View as PDF",
+                                contentDescription = stringResource(id = R.string.view_as_pdf_desc),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -395,9 +393,9 @@ fun ResourceDetailContent(
                 onValueChange = { noteDraft = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
-                placeholder = { Text("Add your observations or adjustments for this topic...") },
-                shape = RoundedCornerShape(16.dp),
+                    .padding(top = dimensionResource(id = R.dimen.padding_small)),
+                placeholder = { Text(stringResource(id = R.string.note_placeholder)) },
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surface,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -409,7 +407,7 @@ fun ResourceDetailContent(
                     }) {
                         Icon(
                             Icons.Default.Save,
-                            contentDescription = "Save Note",
+                            contentDescription = stringResource(id = R.string.save_note),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -418,14 +416,14 @@ fun ResourceDetailContent(
 
             if (showSavedHint) {
                 Text(
-                    text = "Note saved successfully!",
+                    text = stringResource(id = R.string.note_saved_message),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 4.dp, start = 8.dp)
+                    modifier = Modifier.padding(top = dimensionResource(id = R.dimen.padding_xsmall), start = dimensionResource(id = R.dimen.padding_small))
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.header_corner_radius)))
         }
     }
 }
@@ -440,23 +438,23 @@ fun ResourceFolder(
 ) {
     Card(
         modifier = Modifier
-            .width(140.dp)
-            .height(100.dp)
+            .width(dimensionResource(id = R.dimen.folder_width))
+            .height(dimensionResource(id = R.dimen.folder_height))
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = color),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp),
+                .padding(dimensionResource(id = R.dimen.padding_small).plus(dimensionResource(id = R.dimen.padding_xsmall))),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_28dp))
             )
             Column {
                 Text(
@@ -465,7 +463,7 @@ fun ResourceFolder(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "$count items",
+                    text = stringResource(id = R.string.items_count_format, count),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
@@ -490,14 +488,14 @@ fun ResourceItemRow(
         onClick = onOpen,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(vertical = dimensionResource(id = R.dimen.padding_xsmall)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.chip_corner_radius)),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+        border = BorderStroke(dimensionResource(id = R.dimen.border_thin), MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
     ) {
         Row(
             modifier = Modifier
-                .padding(12.dp)
+                .padding(dimensionResource(id = R.dimen.padding_small).plus(dimensionResource(id = R.dimen.padding_xsmall)))
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -505,9 +503,9 @@ fun ResourceItemRow(
                 imageVector = typeIcon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large))
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_small).plus(dimensionResource(id = R.dimen.padding_xsmall))))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = resource.title,
@@ -525,9 +523,9 @@ fun ResourceItemRow(
             IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (resource.isFavorite) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                    contentDescription = "Favorite",
+                    contentDescription = stringResource(id = R.string.favorite),
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small))
                 )
             }
         }
@@ -538,10 +536,10 @@ fun ResourceItemRow(
 fun SectionHeader(title: String, icon: ImageVector) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.padding(bottom = 12.dp)
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small)),
+        modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_small).plus(dimensionResource(id = R.dimen.padding_xsmall)))
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small)))
         Text(
             text = title,
             style = MaterialTheme.typography.titleSmall,
@@ -562,19 +560,19 @@ fun ExpandableSection(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = dimensionResource(id = R.dimen.padding_xsmall)),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
         border = BorderStroke(
-            width = 1.dp,
+            width = dimensionResource(id = R.dimen.border_thin),
             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         ),
         onClick = onToggle
     ) {
-        Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
+        Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.padding_medium)).animateContentSize()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -590,9 +588,9 @@ fun ExpandableSection(
                 IconButton(onClick = { onSpeak() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                        contentDescription = "Read Aloud",
+                        contentDescription = stringResource(id = R.string.read_aloud_desc),
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small))
                     )
                 }
 
@@ -602,7 +600,7 @@ fun ExpandableSection(
                 )
             }
             if (expanded) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_small).plus(dimensionResource(id = R.dimen.padding_xsmall))))
                 Text(
                     text = content,
                     style = MaterialTheme.typography.bodyMedium,

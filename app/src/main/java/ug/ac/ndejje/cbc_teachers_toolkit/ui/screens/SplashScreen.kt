@@ -24,10 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
 @Composable
@@ -40,6 +40,7 @@ fun SplashScreen(
 
     LaunchedEffect(Unit) {
         visible = true
+        // Wait for 2 seconds so the user can see the logo
         delay(2000)
         timerDone = true
     }
@@ -72,7 +73,7 @@ fun SplashScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 Surface(
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.splash_logo_size)),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.onPrimary
                 ) {
@@ -86,7 +87,7 @@ fun SplashScreen(
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
                 
                 Text(
                     text = stringResource(id = R.string.app_name),
@@ -106,4 +107,3 @@ fun SplashScreen(
         }
     }
 }
-

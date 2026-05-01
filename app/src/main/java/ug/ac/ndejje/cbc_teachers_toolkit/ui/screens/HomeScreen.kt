@@ -60,7 +60,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import ug.ac.ndejje.cbc_teachers_toolkit.ui.theme.CbcTeachersToolkitTheme
 
@@ -117,7 +116,7 @@ fun HomeContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // --- Header Section ---
+        // This is the top part of the home screen with the blue background
         val headerGradient = Brush.verticalGradient(
             colors = listOf(
                 MaterialTheme.colorScheme.primary,
@@ -128,35 +127,35 @@ fun HomeContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .clip(RoundedCornerShape(bottomStart = dimensionResource(id = R.dimen.header_corner_radius), bottomEnd = dimensionResource(id = R.dimen.header_corner_radius)))
                 .background(brush = headerGradient)
         ) {
             Column(
                 modifier = Modifier.padding(
-                    start = 12.dp,
-                    end = 20.dp,
-                    top = 16.dp,
-                    bottom = 32.dp
+                    start = dimensionResource(id = R.dimen.padding_12dp),
+                    end = dimensionResource(id = R.dimen.padding_20dp),
+                    top = dimensionResource(id = R.dimen.padding_medium),
+                    bottom = dimensionResource(id = R.dimen.header_corner_radius)
                 )
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onMenuClick) {
                         Icon(
                             imageVector = Icons.Default.Menu,
-                            contentDescription = "Menu",
+                            contentDescription = stringResource(id = R.string.menu),
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.padding_xsmall)))
                     Column {
                         Text(
-                            text = "Welcome Teacher $teacherName",
+                            text = stringResource(id = R.string.home_welcome, teacherName),
                             style = MaterialTheme.typography.headlineSmall,
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.ExtraBold
                         )
                         Text(
-                            text = "What would you like to do today?",
+                            text = stringResource(id = R.string.home_subtitle),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                         )
@@ -168,17 +167,18 @@ fun HomeContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.padding_20dp))
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+                // These small boxes show how many favorites and notes the teacher has
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_12dp))
+                ) {
                 StatCard(
                     count = favoritesCount,
-                    label = "Favorites",
+                    label = stringResource(id = R.string.favorites_label),
                     icon = Icons.Default.Favorite,
                     onClick = onLibraryClick,
                     modifier = Modifier.weight(1f),
@@ -187,7 +187,7 @@ fun HomeContent(
                 )
                 StatCard(
                     count = notesCount,
-                    label = "My Notes",
+                    label = stringResource(id = R.string.my_notes_label),
                     icon = Icons.AutoMirrored.Filled.Note,
                     onClick = onLibraryClick,
                     modifier = Modifier.weight(1f),
@@ -196,59 +196,52 @@ fun HomeContent(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
                 
                 Text(
-                    text = "Quick Actions",
+                    text = stringResource(id = R.string.quick_actions_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 12.dp)
+                    modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.padding_12dp))
                 )
                 
+                // Buttons for Library, Schemes, and About
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
                     ) {
                         ActionButton(
-                            text = "Library",
+                            text = stringResource(id = R.string.my_library),
                             icon = Icons.AutoMirrored.Filled.LibraryBooks,
                             onClick = onLibraryClick,
                             modifier = Modifier.weight(1f)
                         )
                         ActionButton(
-                            text = "Schemes",
+                            text = stringResource(id = R.string.schemes_label),
                             icon = Icons.Default.SettingsSuggest,
                             onClick = onSchemeClick,
                             modifier = Modifier.weight(1f)
                         )
                     }
                     ActionButton(
-                        text = "About the App",
+                        text = stringResource(id = R.string.about_app_label),
                         icon = Icons.Default.Info,
                         onClick = onAboutClick,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_xlarge)))
 
-                // --- Subjects Section ---
-                Text(
-                    text = "My Subjects",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
+                // This list shows all the subjects the teacher can teach
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_12dp))
                 ) {
                     items(items = subjects, key = { it.name }) { subject ->
                         AnimatedVisibility(
@@ -261,17 +254,17 @@ fun HomeContent(
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surface
                                 ),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                                shape = RoundedCornerShape(16.dp),
+                                elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small)),
+                                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
                                 border = BorderStroke(
-                                    width = 1.dp,
+                                    width = dimensionResource(id = R.dimen.border_thin),
                                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                                 )
                             ) {
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp),
+                                        .padding(dimensionResource(id = R.dimen.padding_medium)),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -283,7 +276,7 @@ fun HomeContent(
                                     Icon(
                                         imageVector = Icons.Default.ChevronRight,
                                         contentDescription = null,
-                                        modifier = Modifier.size(24.dp),
+                                        modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)),
                                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                                     )
                                 }
@@ -291,19 +284,19 @@ fun HomeContent(
                         }
                     }
                     item {
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
                         TextButton(
                             onClick = onLogout,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
-                            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                            Spacer(modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_xsmall)))
                             Text(
                                 text = stringResource(id = R.string.logout_button),
                                 fontWeight = FontWeight.Bold
                             )
                         }
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
                     }
                 }
             }
@@ -323,19 +316,19 @@ fun StatCard(
     Surface(
         onClick = onClick,
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
         color = containerColor,
         border = null
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_12dp), vertical = dimensionResource(id = R.dimen.padding_10dp)),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_small)),
                 tint = contentColor
             )
             Column {
@@ -364,19 +357,19 @@ fun ActionButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(64.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.height(dimensionResource(id = R.dimen.button_height_large)),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius)),
         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer
         ),
-        elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+        elevation = androidx.compose.material3.ButtonDefaults.buttonElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_small))
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_small))
         ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
+            Icon(icon, contentDescription = null, modifier = Modifier.size(dimensionResource(id = R.dimen.padding_large)))
             Text(
                 text = text, 
                 style = MaterialTheme.typography.labelLarge,

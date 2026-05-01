@@ -12,6 +12,9 @@ import kotlinx.coroutines.launch
 import ug.ac.ndejje.cbc_teachers_toolkit.data.AuthRepository
 import ug.ac.ndejje.cbc_teachers_toolkit.data.local.UserEntity
 
+import android.content.Context
+import ug.ac.ndejje.cbc_teachers_toolkit.R
+
 enum class AuthMode {
     LOGIN,
     REGISTER
@@ -27,6 +30,10 @@ data class AuthUiState(
     val message: String = ""
 )
 
+/**
+ * This class handles all the logic for user login and registration.
+ * It keeps track of what the user is typing in the login/signup forms.
+ */
 class AuthViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -70,14 +77,15 @@ class AuthViewModel(
         _uiState.value = _uiState.value.copy(selectedSubjects = updated)
     }
 
-    fun authenticate() {
+    // Check if the user is typing the right things before trying to login or register
+    fun authenticate(context: Context) {
         val state = _uiState.value
         if (state.username.isBlank() || state.password.isBlank()) {
-            _uiState.value = state.copy(message = "Username and password are required.")
+            _uiState.value = state.copy(message = context.getString(R.string.error_credentials_required))
             return
         }
         if (state.mode == AuthMode.REGISTER && state.fullName.isBlank()) {
-            _uiState.value = state.copy(message = "Full name is required for registration.")
+            _uiState.value = state.copy(message = context.getString(R.string.error_fullname_required))
             return
         }
 

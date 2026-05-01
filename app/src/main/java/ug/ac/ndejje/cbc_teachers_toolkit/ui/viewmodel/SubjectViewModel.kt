@@ -71,6 +71,10 @@ enum class UpdateStatus {
     FAILED
 }
 
+/**
+ * This class handles all the logic for topics, resources, and schemes of work.
+ * It manages what information is shown on the screens like the library and subject lists.
+ */
 class SubjectViewModel(
     private val repository: TopicRepository,
     private val authRepository: AuthRepository
@@ -189,14 +193,15 @@ class SubjectViewModel(
     }
 
 
-    // This is your "Free Database" link on GitHub
+    // This is the link to our online list of resources on GitHub
     private val resourceIndexUrl = "https://raw.githubusercontent.com/wasswajosh958/Mobile_Programming_Group4_Main_CapstoneProject/main/resources/resource_index.json"
 
+    // This function downloads the latest resources from the internet
     fun updateResourcesNow() {
         viewModelScope.launch {
             _updatesState.value = UpdatesUiState(isUpdating = true, status = UpdateStatus.UPDATING)
             try {
-                // This calls the HTTP sync logic that doesn't need Firebase
+                // We fetch the list from our GitHub repository
                 val count = repository.syncResourcesFromIndexUrl(resourceIndexUrl)
                 _updatesState.value = UpdatesUiState(
                     isUpdating = false,
@@ -253,6 +258,7 @@ class SubjectViewModel(
         _schemeDraftState.value = update(_schemeDraftState.value)
     }
 
+    // Download a file so the teacher can use it offline
     fun downloadResource(context: Context, resource: TeachingResourceEntity) {
         viewModelScope.launch {
             val topic = topicById(resource.topicId) ?: return@launch
@@ -266,7 +272,7 @@ class SubjectViewModel(
             val destinationFile = getResourceDestinationFile(context, topic.subject, topic.classLevel, fileName)
             
             downloadFile(context, resource.url, destinationFile) { savedPath ->
-                // CRITICAL FIX: To prevent "corrupted" errors, we now update DB ONLY when download actually finishes.
+                // Update the database only after the file is fully downloaded
                 viewModelScope.launch {
                     repository.updateResourceDownloadStatus(resource.key, savedPath)
                 }
