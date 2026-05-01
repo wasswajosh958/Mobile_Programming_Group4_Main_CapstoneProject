@@ -13,5 +13,8 @@ data class UserEntity(
     val fullName: String,
     val username: String,
     val password: String,
-    val isLoggedIn: Boolean = false
+    val isLoggedIn: Boolean = false,
+    val isAdmin: Boolean = false,
+    val githubToken: String? = null,
+    val interestedSubjects: String? = null // Comma separated list of subjects
 )

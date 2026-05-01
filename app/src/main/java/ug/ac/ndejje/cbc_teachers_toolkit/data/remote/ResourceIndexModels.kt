@@ -5,7 +5,8 @@ data class ResourceIndexItem(
     val title: String,
     val type: String,
     val url: String,
-    val source: String? = null
+    val source: String? = null,
+    val fileSize: String? = null
 )
 
 data class ResourceIndexResponse(

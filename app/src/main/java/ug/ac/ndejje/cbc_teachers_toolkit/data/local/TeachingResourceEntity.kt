@@ -8,10 +8,11 @@ data class TeachingResourceEntity(
     @PrimaryKey val key: String,
     val topicId: Int,
     val title: String,
-    val type: String, // "NCDC_WEB", "VIDEO", "PDF_LINK", "OTHER"
+    val type: String, // "VIDEO", "PDF_LINK", "PHOTO", "NOTES", "OTHER"
     val url: String,
     val source: String = "NCDC",
     val localPath: String? = null,
     val isDownloaded: Boolean = false,
+    val fileSize: String? = null, // e.g. "4.2 MB"
     val version: Int = 1
 )

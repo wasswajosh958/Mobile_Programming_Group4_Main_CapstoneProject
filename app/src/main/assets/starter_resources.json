@@ -1,0 +1,37 @@
+[
+  {
+    "topicId": 1,
+    "title": "S.1 Biology: Classification of Living Things (Video)",
+    "type": "VIDEO",
+    "url": "https://www.youtube.com/watch?v=vqxomJIBGcY",
+    "source": "YouTube Education"
+  },
+  {
+    "topicId": 5,
+    "title": "S.1 Math: Sets and Venn Diagrams (Notes)",
+    "type": "NOTES",
+    "url": "https://www.google.com/url?sa=t&source=web&rct=j&url=https://ncdc.go.ug/sites/default/files/S1_MATH_PROTOTYPE.pdf",
+    "source": "NCDC Uganda"
+  },
+  {
+    "topicId": 13,
+    "title": "S.1 Chemistry: States of Matter Lesson",
+    "type": "VIDEO",
+    "url": "https://www.youtube.com/watch?v=HAPc6JH85pM",
+    "source": "Khan Academy"
+  },
+  {
+    "topicId": 17,
+    "title": "S.1 Physics: Introduction to Force",
+    "type": "NOTES",
+    "url": "https://ncdc.go.ug/resource-preview-content?id=physics_s1",
+    "source": "NCDC Uganda"
+  },
+  {
+    "topicId": 45,
+    "title": "S.1 ICT: Computer Parts and Functions",
+    "type": "VIDEO",
+    "url": "https://www.youtube.com/watch?v=ExxFxD4OSZ0",
+    "source": "ICT Teachers Association Uganda"
+  }
+]

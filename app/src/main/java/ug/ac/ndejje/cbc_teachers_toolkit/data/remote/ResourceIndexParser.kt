@@ -18,13 +18,19 @@ object ResourceIndexParser {
                 } else {
                     null
                 }
+                val fileSizeValue = if (item.has("fileSize") && !item.isNull("fileSize")) {
+                    item.getString("fileSize")
+                } else {
+                    null
+                }
                 add(
                     ResourceIndexItem(
                         topicId = item.getInt("topicId"),
                         title = item.getString("title"),
                         type = item.getString("type"),
                         url = item.getString("url"),
-                        source = sourceValue
+                        source = sourceValue,
+                        fileSize = fileSizeValue
                     )
                 )
             }

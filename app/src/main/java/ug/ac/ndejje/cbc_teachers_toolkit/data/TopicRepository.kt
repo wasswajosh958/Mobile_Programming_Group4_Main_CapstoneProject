@@ -1,18 +1,23 @@
 package ug.ac.ndejje.cbc_teachers_toolkit.data
 
+import android.content.Context
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ug.ac.ndejje.cbc_teachers_toolkit.data.remote.ResourceIndexParser
 import ug.ac.ndejje.cbc_teachers_toolkit.data.remote.SimpleHttpClient
-import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicDao
-import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TopicEntity
-import ug.ac.ndejje.cbc_teachers_toolkit.data.local.NoteEntity
-import ug.ac.ndejje.cbc_teachers_toolkit.data.local.SchemeOfWorkEntity
-import ug.ac.ndejje.cbc_teachers_toolkit.data.local.TeachingResourceEntity
+import ug.ac.ndejje.cbc_teachers_toolkit.data.local.*
+import kotlinx.coroutines.flow.emptyFlow
+import ug.ac.ndejje.cbc_teachers_toolkit.data.remote.FirebaseSyncManager
 import ug.ac.ndejje.cbc_teachers_toolkit.domain.Topic
 
 class TopicRepository(
-    private val topicDao: TopicDao
+    private val context: Context,
+    private val topicDao: TopicDao,
+    private val userDao: UserDao,
+    private val adminResourceDao: AdminResourceDao,
+    private val firebaseSyncManager: FirebaseSyncManager
 ) {
     fun observeTopics(): Flow<List<Topic>> {
         return topicDao.observeTopics().map { entities -> entities.map { it.toDomain() } }
@@ -41,9 +46,43 @@ class TopicRepository(
             topicDao.insertAll(CbcSeedData.topics)
         }
         if (topicDao.countResources() == 0) {
-            topicDao.insertResources(buildOfflineStarterResources())
+            val fromAssets = loadStarterResourcesFromAssets()
+            val combined = (fromAssets + CbcSeedData.starterResources).distinctBy { it.key }
+            if (combined.isNotEmpty()) {
+                topicDao.insertResources(combined)
+            } else {
+                topicDao.insertResources(buildOfflineStarterResources())
+            }
         }
     }
+
+    private fun loadStarterResourcesFromAssets(): List<TeachingResourceEntity> {
+        return try {
+            val jsonString = context.assets.open("starter_resources.json").bufferedReader().use { it.readText() }
+            val type = object : TypeToken<List<StarterResource>>() {}.type
+            val starterList: List<StarterResource> = Gson().fromJson(jsonString, type)
+            starterList.map { item ->
+                TeachingResourceEntity(
+                    key = "${item.topicId}|${item.type}|${item.url}",
+                    topicId = item.topicId,
+                    title = item.title,
+                    type = item.type,
+                    url = item.url,
+                    source = item.source
+                )
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    private data class StarterResource(
+        val topicId: Int,
+        val title: String,
+        val type: String,
+        val url: String,
+        val source: String
+    )
 
     fun observeResourcesForTopic(topicId: Int): Flow<List<TeachingResourceEntity>> {
         return topicDao.observeResourcesForTopic(topicId)
@@ -51,6 +90,22 @@ class TopicRepository(
 
     fun observeDownloadedResources(): Flow<List<TeachingResourceEntity>> {
         return topicDao.observeDownloadedResources()
+    }
+
+    fun observeAdminUploads(): Flow<List<AdminResourceEntity>> {
+        return adminResourceDao.getAllUploads()
+    }
+
+    suspend fun insertAdminUpload(upload: AdminResourceEntity) {
+        adminResourceDao.insertUpload(upload)
+    }
+
+    suspend fun getCurrentUser(): UserEntity? {
+        return userDao.getCurrentUser()
+    }
+
+    suspend fun updateGithubToken(token: String) {
+        userDao.updateCurrentToken(token)
     }
 
     suspend fun getUndownloadedResources(): List<TeachingResourceEntity> {
@@ -62,6 +117,14 @@ class TopicRepository(
         // We seed generic NCDC search links per topic to enable teachers to reach official sources.
         // If resources already exist, we do nothing.
         // (A full remote sync can be added later.)
+    }
+
+    suspend fun syncResourcesFromFirebase(): Int {
+        val entities = firebaseSyncManager.fetchResourcesFromFirestore()
+        if (entities.isNotEmpty()) {
+            topicDao.insertResources(entities)
+        }
+        return entities.size
     }
 
     suspend fun syncResourcesFromIndexUrl(indexUrl: String): Int {

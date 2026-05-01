@@ -20,9 +20,20 @@ class AuthRepository(
                 )
             )
         }
+        val admin = userDao.findByUsername(ADMIN_USERNAME)
+        if (admin == null) {
+            userDao.insertUser(
+                UserEntity(
+                    fullName = "Administrator",
+                    username = ADMIN_USERNAME,
+                    password = ADMIN_PASSWORD,
+                    isAdmin = true
+                )
+            )
+        }
     }
 
-    suspend fun register(fullName: String, username: String, password: String): Result<Unit> {
+    suspend fun register(fullName: String, username: String, password: String, interestedSubjects: List<String>): Result<Unit> {
         val existing = userDao.findByUsername(username.trim())
         if (existing != null) return Result.failure(IllegalArgumentException("Username already exists"))
 
@@ -30,7 +41,8 @@ class AuthRepository(
             UserEntity(
                 fullName = fullName.trim(),
                 username = username.trim(),
-                password = password
+                password = password,
+                interestedSubjects = interestedSubjects.joinToString(",")
             )
         )
         userDao.loginById(userId)
@@ -48,8 +60,14 @@ class AuthRepository(
         userDao.logoutAll()
     }
 
+    suspend fun updateGithubToken(token: String) {
+        userDao.updateCurrentToken(token)
+    }
+
     companion object {
         private const val DEFAULT_USERNAME = "teacher"
         private const val DEFAULT_PASSWORD = "1234"
+        private const val ADMIN_USERNAME = "admin"
+        private const val ADMIN_PASSWORD = "12345"
     }
 }

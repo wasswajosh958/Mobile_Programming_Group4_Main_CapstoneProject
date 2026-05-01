@@ -17,11 +17,10 @@ class SyncWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val repository = (applicationContext as CbcToolkitApplication).container.topicRepository
-        val resourceIndexUrl =
-            "https://raw.githubusercontent.com/wasswajosh958/Mobile_Programming_Group4_Main_CapstoneProject/main/resources/resource_index.json"
+        val resourceIndexUrl = "https://raw.githubusercontent.com/wasswajosh958/Mobile_Programming_Group4_Main_CapstoneProject/main/resources/resource_index.json"
 
         try {
-            // 1. Sync metadata
+            // 1. Sync metadata from GitHub Index (Replacing Firebase)
             repository.syncResourcesFromIndexUrl(resourceIndexUrl)
 
             // 2. Automatically download new resources (limit to 10 at a time to save data/bandwidth)

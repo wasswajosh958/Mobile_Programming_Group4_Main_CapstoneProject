@@ -32,6 +32,11 @@ class MainActivity : ComponentActivity() {
         
         scheduleSync()
 
+        // Trigger an immediate sync on startup to ensure fresh data
+        WorkManager.getInstance(applicationContext).enqueue(
+            androidx.work.OneTimeWorkRequestBuilder<SyncWorker>().build()
+        )
+
         setContent {
             CbcToolkitAppRoot()
         }

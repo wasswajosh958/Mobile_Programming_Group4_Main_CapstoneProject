@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.android)
+    // Removed google-services as we are using GitHub JSON now
+    // alias(libs.plugins.google.services)
 }
 
 android {
@@ -41,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.gson)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -60,6 +63,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.7")
     implementation("androidx.room:room-runtime:2.8.0")
     implementation("androidx.room:room-ktx:2.8.0")
+    implementation(libs.kotlinx.coroutines.play.services)
     ksp("androidx.room:room-compiler:2.8.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     testImplementation(libs.junit)
