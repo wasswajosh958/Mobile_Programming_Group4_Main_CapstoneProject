@@ -121,6 +121,11 @@ fun SchemeBuilderScreen(
     )
 }
 
+/**
+ * The main UI for creating and managing Schemes of Work.
+ * This screen allows teachers to fill in a form, save it locally, 
+ * and view or share their saved schemes.
+ */
 @Composable
 fun SchemeBuilderContent(
     draft: SchemeDraftUiState,
@@ -168,7 +173,7 @@ fun SchemeBuilderContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // --- Header Section ---
+        // Header with a nice blue gradient
         val headerGradient = Brush.verticalGradient(
             colors = listOf(
                 MaterialTheme.colorScheme.primary,
@@ -224,7 +229,7 @@ fun SchemeBuilderContent(
         ) {
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
-            // --- Guide Toggle ---
+            // This button shows or hides the helpful tips for making a scheme
             OutlinedButton(
                 onClick = { showGuide = !showGuide },
                 modifier = Modifier.fillMaxWidth(),
@@ -295,7 +300,7 @@ fun SchemeBuilderContent(
 
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_large)))
 
-            // --- Form Section ---
+            // The main form where teachers enter their lesson details
             SchemeSectionHeader(
                 title = if (isEditing) stringResource(id = R.string.edit_scheme_title) else stringResource(id = R.string.general_info_title),
                 icon = if (isEditing) Icons.Default.Edit else Icons.Default.Info,
@@ -409,7 +414,7 @@ fun SchemeBuilderContent(
 
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_12dp)))
 
-            // --- Save Button ---
+            // Save button to store the scheme in the app's database
             Button(
                 onClick = onSaveScheme,
                 modifier = Modifier
@@ -471,7 +476,7 @@ fun SchemeBuilderContent(
 
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_xlarge)))
 
-            // --- History Section ---
+            // This section shows a list of schemes the teacher has already saved
             if (schemes.isNotEmpty()) {
                 SchemeSectionHeader(title = stringResource(id = R.string.saved_schemes_title), icon = Icons.Default.History)
 
