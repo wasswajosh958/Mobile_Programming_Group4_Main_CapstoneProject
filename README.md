@@ -30,3 +30,6 @@ We wrote some tests to make sure the favorites work and the navigation doesn't b
 When testing, we used physic and chemistry inorder not to make the app so bulk for proper submission
 
 This project was done by Group 4 students.
+
+Below is the link to the youtube channel with the presentation of group 4 members explaining the CBC TEACHERS TOOL KIT;
+https://youtu.be/oEkD2pe53G0
